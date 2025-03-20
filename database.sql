@@ -1,7 +1,3 @@
--- Create the database
-CREATE DATABASE techdepotrgv;
-USE techdepotrgv;
-
 -- Users Table
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
