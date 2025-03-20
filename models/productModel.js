@@ -1,11 +1,21 @@
-import pool from '../config/db.js';
+import { sequelize } from '../config/db.js';
+import { DataTypes } from 'sequelize';
 
+// Define Product model
+export const Product = sequelize.define('Product', {
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.STRING, allowNull: false },
+    price: { type: DataTypes.FLOAT, allowNull: false },
+    stock: { type: DataTypes.INTEGER, allowNull: false }
+}, { tableName: 'products', timestamps: false });
+
+// Get all products
 export const getAllProducts = async () => {
-    const [rows] = await pool.query('SELECT * FROM products');
-    return rows;
+    return await Product.findAll();
 };
 
+// Get product by ID
 export const getProductById = async (id) => {
-    const [rows] = await pool.query('SELECT * FROM products WHERE product_id = ?', [id]);
-    return rows[0];
+    return await Product.findByPk(id);
 };

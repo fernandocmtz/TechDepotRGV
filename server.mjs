@@ -1,20 +1,24 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const dotenv = require('dotenv');
-const { sequelize } = require('./config/db');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import dotenv from 'dotenv';
+import { sequelize } from './config/db.js';
 
 // Import Routes
-const userRoutes = require('./routes/userRoutes');
-const productRoutes = require('./routes/productRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-const returnRoutes = require('./routes/returnRoutes');
-const shipmentRoutes = require('./routes/shipmentRoutes');
+import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import shipmentRoutes from './routes/shipmentRoutes.js';
 
+// Load environment variables
 dotenv.config();
+
+// Initialize Express App
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -27,8 +31,24 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/shipments', shipmentRoutes);
 
-// Start the Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+// Function to start server after ensuring DB connection
+async function startServer() {
+    try {
+        await sequelize.authenticate();
+        console.log('✅ Database connected successfully.');
+        await sequelize.sync(); // ✅ Ensures tables are created
+        console.log('✅ Tables synchronized.');
+
+        const PORT = process.env.PORT || 5001;
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+        });
+
+    } catch (error) {
+        console.error('❌ Database connection failed:', error);
+        process.exit(1); // Exit if DB connection fails
+    }
+}
+
+// Start the server
+startServer();
