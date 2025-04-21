@@ -1,0 +1,76 @@
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+export interface ProductProps {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+}
+
+interface ProductCardProps {
+  product: ProductProps;
+  className?: string;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  return (
+    <div 
+      className={cn(
+        "product-card rounded-xl overflow-hidden bg-white border border-border/40 relative flex flex-col h-full",
+        className
+      )}
+    >
+      <div className="overflow-hidden aspect-[4/3] bg-tech-muted">
+        <img
+          src={product.image}
+          alt={product.name}
+          className={cn(
+            "object-cover w-full h-full animate-image",
+            imageLoaded ? "image-loaded" : "image-loading"
+          )}
+          onLoad={() => setImageLoaded(true)}
+        />
+      </div>
+      
+      <div className="p-4 flex-grow flex flex-col">
+        <span className="text-xs font-medium text-tech-blue bg-tech-blue/10 px-2 py-1 rounded-full inline-block mb-2 w-fit">
+          {product.category}
+        </span>
+        
+        <Link to={`/products/${product.id}`}>
+          <h3 className="font-medium text-lg hover:text-tech-blue transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+        
+        <p className="text-muted-foreground text-sm mt-2 line-clamp-2 flex-grow">
+          {product.description}
+        </p>
+        
+        <div className="mt-4 flex items-center justify-between">
+          <span className="font-bold text-lg">${product.price.toFixed(2)}</span>
+          
+          <Button 
+            size="sm" 
+            variant="outline"
+            className="hover:bg-tech-blue hover:text-white transition-colors"
+          >
+            <ShoppingCart className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductCard;
