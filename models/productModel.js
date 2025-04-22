@@ -24,9 +24,13 @@ export const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'categories',    // or the Category model name if you import it here
+      model: 'categories',
       key: 'category_id'
     }
+  },
+  image_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   tableName: 'products',
