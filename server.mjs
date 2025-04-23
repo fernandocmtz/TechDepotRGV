@@ -7,6 +7,7 @@ import { sequelize } from './config/db.js';
 // Import Routes
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
@@ -26,6 +27,7 @@ app.use(express.json());
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/returns', returnRoutes);
