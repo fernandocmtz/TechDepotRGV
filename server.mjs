@@ -13,7 +13,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import shipmentRoutes from './routes/shipmentRoutes.js';
-
+import authRoutes from './routes/authRoutes.js';
 // Load environment variables
 dotenv.config();
 
@@ -34,6 +34,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/shipments', shipmentRoutes);
+app.use('/api/auth', authRoutes);
 
 // Function to start server after ensuring DB connection
 async function startServer() {
