@@ -41,7 +41,12 @@ export const Product = sequelize.define('Product', {
 
 // Get all products
 export const getAllProducts = async () => {
-  return await Product.findAll();
+  return await Product.findAll({
+  include: [{
+    model: Category,
+    attributes: ['name'], // Optional: only fetch the 'name' column
+    }],
+  });
 };
 
 // Get product by ID
