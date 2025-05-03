@@ -1,5 +1,6 @@
 import { sequelize } from '../config/db.js';
 import { DataTypes } from 'sequelize';
+import { Category } from './categoryModel.js';
 
 // Define Product model
 export const Product = sequelize.define('Product', {
@@ -24,7 +25,7 @@ export const Product = sequelize.define('Product', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'categories',
+      model: Category, 
       key: 'category_id'
     }
   },

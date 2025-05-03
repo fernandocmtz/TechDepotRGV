@@ -14,6 +14,9 @@ import orderRoutes from './routes/orderRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import shipmentRoutes from './routes/shipmentRoutes.js';
 
+// Model Associations
+import {associateModels} from './models/associations.js'; // Ensure associations are set up
+
 // Load environment variables
 dotenv.config();
 
@@ -40,7 +43,11 @@ async function startServer() {
     try {
         await sequelize.authenticate();
         console.log('✅ Database connected successfully.');
-        await sequelize.sync(); // ✅ Ensures tables are created
+
+        associateModels() // Create model associations
+        console.log('✅ Models associated successfully.');
+
+        await sequelize.sync({alter: true}); // ✅ Ensures tables are created
         console.log('✅ Tables synchronized.');
 
         const PORT = process.env.PORT || 5001;
