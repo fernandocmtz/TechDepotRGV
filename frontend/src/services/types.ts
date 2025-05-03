@@ -7,4 +7,7 @@ export type Product = {
   image_url: string;
   createdAt: string;
   updatedAt: string;
+  Category:{
+    name: string;
+  }
 }

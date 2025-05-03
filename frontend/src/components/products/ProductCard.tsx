@@ -44,7 +44,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
       
       <div className="p-4 flex-grow flex flex-col">
         <span className="text-xs font-medium text-tech-blue bg-tech-blue/10 px-2 py-1 rounded-full inline-block mb-2 w-fit">
-          {product.category_id}
+          {product.Category.name}
         </span>
         
         <Link to={`/products/${product.product_id}`}>
