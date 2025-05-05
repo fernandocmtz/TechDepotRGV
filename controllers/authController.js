@@ -41,7 +41,7 @@ export const login = async (req, res) => {
 
 // Registration Function
 export const register = async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, firstName, lastName, email, password, role } = req.body;
 
   try {
     // Check for duplicate username
@@ -59,6 +59,8 @@ export const register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      first_name: firstName,
+      last_name: lastName,
       role: role || 'user' // fallback if no role is provided
     });
 

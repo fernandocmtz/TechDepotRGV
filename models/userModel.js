@@ -9,6 +9,11 @@ export const User = sequelize.define('User', {
         primaryKey: true,
         autoIncrement: true
     },
+    username: {
+        type:DataTypes.STRING(50),
+        allowNull: false,
+        unique: true
+    },
     first_name: {
         type:DataTypes.STRING(50),
         allowNull: false
@@ -25,7 +30,7 @@ export const User = sequelize.define('User', {
         type:DataTypes.STRING(10),
     },
     password:{
-        type:DataTypes.STRING(20),
+        type:DataTypes.STRING,
         allowNull: false
     },
     address_id:{
