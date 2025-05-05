@@ -1,32 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState  } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
-import { getCategories, getProducts } from '@/services/productService';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { useCategories } from '@/hooks/useCategories';
 
 const Categories = () => {
-  const [categories, setCategories] = useState([]);
+  const {categories, loading} = useCategories();
+
   const [categoryData, setCategoryData] = useState<Record<string, number>>({});
-  const [loaded, setLoaded] = useState(false);
-  
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const allCategories = getCategories();
-      setCategories(allCategories);
-      
-      // Count products per category
-      const counts: Record<string, number> = {};
-      allCategories.forEach(category => {
-        counts[category] = getProducts(category).length;
-      });
-      
-      setCategoryData(counts);
-      setLoaded(true);
-    }, 500);
-  }, []);
+
+  const loaded = !loading;
   
   return (
     <Layout>
@@ -43,22 +28,22 @@ const Categories = () => {
           {loaded ? (
             categories.map((category, index) => (
               <Link
-                key={category}
-                to={`/products?category=${category}`}
+                key={category.id}
+                to={`/products?category=${category.name}`}
                 className="group relative overflow-hidden rounded-xl aspect-[4/3] animate-fade-up"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="absolute inset-0 bg-tech-dark/60 group-hover:bg-tech-dark/40 transition-colors duration-300 z-10" />
                 <img 
-                  src={`https://source.unsplash.com/featured/?${category.toLowerCase()},tech`} 
-                  alt={category} 
+                  src={`https://source.unsplash.com/featured/?${category.name.toLowerCase()},tech`} 
+                  alt={category.name} 
                   className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 z-20 p-6 flex flex-col justify-end">
                   <div className="bg-tech-blue/10 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-medium text-white w-fit mb-2">
-                    {categoryData[category]} Products
+                    {3} Products
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">{category}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-2">{category.name}</h3>
                   
                   <div className="flex items-center text-white text-sm font-medium mt-2 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                     <span>Browse Products</span>

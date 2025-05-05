@@ -1,31 +1,22 @@
 
-import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
-import { getCategories } from '@/services/productService';
+import { useCategories } from '@/hooks/useCategories';
 
 
 const Index = () => {
 
-  const {products: productsV2, loading} = useProducts();
-  const [categories, setCategories] = useState([]);
-
-    useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setCategories(getCategories());
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const {products: productsV2, loading: productsLoading} = useProducts();
+  const {categories, loading: categoriesLoading } = useCategories();
 
   // Can move this to backend 
   const featuredProducts = [...productsV2].sort(() => 0.5 - Math.random()).slice(0, 3);
-  const loaded = !loading && productsV2.length > 0;
+  const productsLoaded = !productsLoading;
+  const categoriesLoaded = !categoriesLoading;
 
   return (
     <Layout>
@@ -93,7 +84,7 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loaded ? (
+            {productsLoaded ? (
               featuredProducts.map((product, index) => (
                 <div
                   key={product.product_id}
@@ -140,23 +131,23 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loaded ? (
+            {categoriesLoaded ? (
               categories.map((category, index) => (
                 <Link
-                  key={category}
-                  to={`/products?category=${category}`}
+                  key={category.id}
+                  to={`/products?category=${category.name}`}
                   className="group relative h-64 rounded-xl overflow-hidden animate-fade-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-tech-dark/80 to-tech-dark/20 group-hover:opacity-90 transition-opacity z-10" />
                   <img 
-                    src={`https://source.unsplash.com/featured/?${category.toLowerCase()},tech`} 
-                    alt={category} 
+                    src={`https://source.unsplash.com/featured/?${category.name.toLowerCase()},tech`} 
+                    alt={category.name} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 z-20 flex items-center justify-center">
                     <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">{category}</h3>
+                      <h3 className="text-2xl font-bold text-white mb-2">{category.name}</h3>
                       <span className="inline-flex items-center text-sm font-medium text-white/90 bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full">
                         Explore <ArrowRight className="ml-1 h-3 w-3" />
                       </span>
