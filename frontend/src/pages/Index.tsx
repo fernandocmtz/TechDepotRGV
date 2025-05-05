@@ -141,7 +141,7 @@ const Index = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-tech-dark/80 to-tech-dark/20 group-hover:opacity-90 transition-opacity z-10" />
                   <img 
-                    src={`https://source.unsplash.com/featured/?${category.name.toLowerCase()},tech`} 
+                    src={category.image_url} 
                     alt={category.name} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />

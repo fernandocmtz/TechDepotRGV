@@ -35,7 +35,7 @@ const Categories = () => {
               >
                 <div className="absolute inset-0 bg-tech-dark/60 group-hover:bg-tech-dark/40 transition-colors duration-300 z-10" />
                 <img 
-                  src={`https://source.unsplash.com/featured/?${category.name.toLowerCase()},tech`} 
+                  src={category.image_url} 
                   alt={category.name} 
                   className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-110"
                 />
