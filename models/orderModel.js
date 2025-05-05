@@ -19,6 +19,11 @@ export const Order = sequelize.define('Order', {
     address_id: {
         type:DataTypes.INTEGER,
         allowNull: false,
+        //needs foreign key 
+        // references:{
+        //     model:'address',
+        //     key:'address_id'
+        //}
     },
     status: {
         type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
