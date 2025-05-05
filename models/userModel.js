@@ -34,7 +34,8 @@ export const User = sequelize.define('User', {
             model: 'address_id',
             key: 'address_id'
         }
-    }
+    },
+    role: { type: DataTypes.STRING, allowNull: false, defaultValue: 'user' },
 }, {
      tableName: 'users',
      timestamps: false });
@@ -42,10 +43,10 @@ export const User = sequelize.define('User', {
 
 // Fetch all users
 export const getAllUsers = async () => {
-    return await User.findAll(); // ✅ Replaces `pool.query()`
+    return await User.findAll();
 };
 
 // Fetch user by ID
 export const getUserById = async (id) => {
-    return await User.findByPk(id); // ✅ Replaces `pool.query()`
+    return await User.findByPk(id);
 };

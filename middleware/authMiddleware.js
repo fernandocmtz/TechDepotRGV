@@ -14,7 +14,7 @@ export const authenticateUser = (req, res, next) => {
         req.user = decoded; // attach decoded payload (like userId, role, etc.)
         next(); // pass to next route/middleware
     } catch (err) {
-        // 👇 Optional: helpful for debugging token issues
+        // Helpful for debugging token issues
         console.error('JWT verification failed:', err.message);
         return res.status(403).json({ message: 'Invalid or expired token' });
     }
