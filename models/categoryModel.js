@@ -1,5 +1,6 @@
 import { sequelize } from '../config/db.js';
 import { DataTypes } from 'sequelize';
+import { Product } from './productModel.js';
 
 // Define Category model
 export const Category = sequelize.define('Category', {
@@ -19,7 +20,18 @@ export const Category = sequelize.define('Category', {
 
 // Get all categories
 export const getAllCategories = async () => {
-  return await Category.findAll();
+  return await Category.findAll({
+    attributes: [
+      'category_id',
+      'name',
+      [sequelize.fn('COUNT', sequelize.col('Products.product_id')), 'productCount']
+    ],
+    include: [{
+      model: Product,
+      attributes: [],
+    }],
+    group: ['Category.category_id']
+  });
 };
 
 // Get category by ID
