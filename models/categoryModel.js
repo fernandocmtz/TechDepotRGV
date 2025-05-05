@@ -12,6 +12,10 @@ export const Category = sequelize.define('Category', {
   name: {
     type: DataTypes.STRING(50),
     allowNull: false
+  },
+  image_url: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   tableName: 'categories',
@@ -24,6 +28,7 @@ export const getAllCategories = async () => {
     attributes: [
       'category_id',
       'name',
+      'image_url',
       [sequelize.fn('COUNT', sequelize.col('Products.product_id')), 'productCount']
     ],
     include: [{
