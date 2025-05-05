@@ -41,7 +41,7 @@ const Categories = () => {
                 />
                 <div className="absolute inset-0 z-20 p-6 flex flex-col justify-end">
                   <div className="bg-tech-blue/10 backdrop-blur-sm rounded-lg px-3 py-1 text-xs font-medium text-white w-fit mb-2">
-                    {3} Products
+                    {category.productCount == 1 ? `${category.productCount} Product` : `${category.productCount} Products`}
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">{category.name}</h3>
                   
