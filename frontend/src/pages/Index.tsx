@@ -4,24 +4,28 @@ import { Link } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import ProductCard from '@/components/products/ProductCard';
 import { Button } from '@/components/ui/button';
-import { getProducts, getCategories } from '@/services/productService';
 import { ArrowRight } from 'lucide-react';
+import { useProducts } from '@/hooks/useProducts';
+import { getCategories } from '@/services/productService';
+
 
 const Index = () => {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => {
+  const {products: productsV2, loading} = useProducts();
+  const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
-      setFeaturedProducts(getProducts().slice(0, 3));
       setCategories(getCategories());
-      setLoaded(true);
     }, 300);
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Can move this to backend 
+  const featuredProducts = [...productsV2].sort(() => 0.5 - Math.random()).slice(0, 3);
+  const loaded = !loading && productsV2.length > 0;
 
   return (
     <Layout>
@@ -92,7 +96,7 @@ const Index = () => {
             {loaded ? (
               featuredProducts.map((product, index) => (
                 <div
-                  key={product.id}
+                  key={product.product_id}
                   className="animate-fade-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >

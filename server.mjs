@@ -15,6 +15,8 @@ import returnRoutes from './routes/returnRoutes.js';
 import shipmentRoutes from './routes/shipmentRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
+// Model Associations
+import {associateModels} from './models/associations.js'; // Ensure associations are set up
 // Import Error Handler
 import errorHandler from './middleware/errorHandler.js';
 
