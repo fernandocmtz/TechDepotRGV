@@ -1,6 +1,7 @@
 import { createContext } from "react";
 
 export interface AuthContextType {
+  isAuthenticated: boolean;
   accessToken: string;
   loading: boolean;
   login: (
@@ -12,6 +13,7 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType>({
+  isAuthenticated: false,
   accessToken: "",
   loading: true,
   login: async () => ({ ok: false, message: "" }),

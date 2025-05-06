@@ -98,7 +98,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ accessToken, loading, login, logout, fetchAuth }}
+      value={{
+        isAuthenticated: !!accessToken,
+        accessToken,
+        loading,
+        login,
+        logout,
+        fetchAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>
