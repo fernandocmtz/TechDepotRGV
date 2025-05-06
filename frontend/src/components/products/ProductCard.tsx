@@ -1,10 +1,10 @@
-
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Product } from '@/services/types';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Product } from "@/services/types";
+import { useCart } from "@/context/cart/useCart";
 
 export interface ProductProps {
   id: string;
@@ -23,8 +23,10 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
+  const { addToCart } = useCart();
+
   return (
-    <div 
+    <div
       className={cn(
         "product-card rounded-xl overflow-hidden bg-white border border-border/40 relative flex flex-col h-full",
         className
@@ -41,29 +43,34 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
           onLoad={() => setImageLoaded(true)}
         />
       </div>
-      
+
       <div className="p-4 flex-grow flex flex-col">
         <span className="text-xs font-medium text-tech-blue bg-tech-blue/10 px-2 py-1 rounded-full inline-block mb-2 w-fit">
           {product.Category.name}
         </span>
-        
+
         <Link to={`/products/${product.product_id}`}>
           <h3 className="font-medium text-lg hover:text-tech-blue transition-colors">
             {product.name}
           </h3>
         </Link>
-        
+
         <p className="text-muted-foreground text-sm mt-2 line-clamp-2 flex-grow">
           {product.description}
         </p>
-        
+
         <div className="mt-4 flex items-center justify-between">
-          <span className="font-bold text-lg">${Number(product.price).toFixed(2)}</span>
-          
-          <Button 
-            size="sm" 
+          <span className="font-bold text-lg">
+            ${Number(product.price).toFixed(2)}
+          </span>
+
+          <Button
+            size="sm"
             variant="outline"
             className="hover:bg-tech-blue hover:text-white transition-colors"
+            onClick={() => {
+              addToCart(product.product_id, 1);
+            }}
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Add
