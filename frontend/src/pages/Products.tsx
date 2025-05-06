@@ -31,8 +31,8 @@ const Products = () => {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({
-    min: undefined,
-    max: undefined,
+    min: "",
+    max: "",
   });
   const [filtersVisible, setFiltersVisible] = useState(false);
 
@@ -67,40 +67,29 @@ const Products = () => {
     }
   }, [queryCategory]);
 
-  useEffect(() => {
-    {
-      refresh({
-        category_id: activeCategory.category_id,
-        minPrice: priceRange.min ? parseFloat(priceRange.min) : undefined,
-        maxPrice: priceRange.max ? parseFloat(priceRange.max) : undefined,
-      });
-    }
-  }, [categoriesV2, activeCategory, priceRange.min, priceRange.max, refresh]);
-
   const handleCategoryChange = (category: Category) => {
     setActiveCategory(category);
+    setPriceRange({ min: "", max: "" });
+    setSearchQuery("");
+
+    refresh({
+      category_id: category.category_id,
+    });
   };
 
   const handlePriceFilter = () => {
-    const min = priceRange.min ? parseFloat(priceRange.min) : 0;
-    const max = priceRange.max ? parseFloat(priceRange.max) : Infinity;
-
-    setPriceRange({
-      min,
-      max,
+    refresh({
+      category_id: activeCategory.category_id,
+      minPrice: priceRange.min ? Number(priceRange.min) : undefined,
+      maxPrice: priceRange.max ? Number(priceRange.max) : undefined,
     });
   };
 
   const clearFilters = () => {
-    setSearchQuery("");
-    setPriceRange({ min: "", max: "" });
     handleCategoryChange(activeCategory);
   };
 
   const loaded = !loading;
-
-  console.log(queryCategory);
-  console.log(activeCategory);
 
   return (
     <Layout>
@@ -138,6 +127,7 @@ const Products = () => {
                   <div>
                     <Input
                       type="number"
+                      min={0}
                       placeholder="Min"
                       value={priceRange.min}
                       onChange={(e) =>
@@ -148,6 +138,7 @@ const Products = () => {
                   <div>
                     <Input
                       type="number"
+                      min={priceRange.min || 0}
                       placeholder="Max"
                       value={priceRange.max}
                       onChange={(e) =>
