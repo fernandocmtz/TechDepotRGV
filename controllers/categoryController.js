@@ -2,8 +2,8 @@ import { Category } from "../models/categoryModel.js";
 import { sequelize } from "../config/db.js";
 import { Product } from "../models/productModel.js";
 
-export const getAllCategories = async () => {
-  return await Category.findAll({
+export const getAllCategories = async (req, res, next) => {
+  const categories = await Category.findAll({
     attributes: [
       "category_id",
       "name",
@@ -21,6 +21,8 @@ export const getAllCategories = async () => {
     ],
     group: ["Category.category_id"],
   });
+
+  res.json(categories);
 };
 
 export const getCategoryById = async (req, res, next) => {

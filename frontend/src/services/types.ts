@@ -7,14 +7,14 @@ export type Product = {
   image_url: string;
   createdAt: string;
   updatedAt: string;
-  Category:{
+  Category: {
     name: string;
-  }
-}
+  };
+};
 
 export type Category = {
-  id: number;
+  category_id: number;
   name: string;
   productCount: number;
   image_url: string;
-}
+};
