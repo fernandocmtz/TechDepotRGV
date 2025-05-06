@@ -10,25 +10,38 @@ import { getProducts, getCategories } from "@/services/productService";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { Category } from "@/services/types";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryCategory = searchParams.get("category");
 
-  const { products: productsV2, refresh } = useProducts();
+  const { products: productsV2, refresh, loading } = useProducts();
   const { categories: categoriesV2 } = useCategories();
+
+  const queryCategoryId = searchParams.get("category")
+    ? Number(searchParams.get("category"))
+    : null;
+
+  const queryCategory = categoriesV2.find(
+    (category: Category) => category.category_id === queryCategoryId
+  );
 
   const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState(
-    Number(queryCategory) || null
+    queryCategory ?? ({ category_id: null, name: "All Products" } as Category)
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [loaded, setLoaded] = useState(false);
+  const [priceRange, setPriceRange] = useState({
+    min: undefined,
+    max: undefined,
+  });
   const [filtersVisible, setFiltersVisible] = useState(false);
 
   const categories = useMemo(
-    () => ["all", ...categoriesV2.map((category) => category.name)],
+    () => [
+      { category_id: null, name: "All Products" } as Category,
+      ...categoriesV2,
+    ],
     [categoriesV2]
   );
 
@@ -45,38 +58,16 @@ const Products = () => {
   }, [productsV2, searchQuery]);
 
   useEffect(() => {
-    const fetchData = () => {
-      setLoaded(false);
-
-      // Simulate API call
-      setTimeout(() => {
-        let filteredProducts = queryCategory
-          ? getProducts(queryCategory)
-          : getProducts();
-
-        setProducts(filteredProducts);
-        setLoaded(true);
-      }, 500);
-    };
-
-    fetchData();
-  }, [queryCategory]);
-
-  useEffect(() => {
     {
       refresh({
-        // category_id:
-        //   activeCategory === "all"
-        //     ? undefined
-        //     : categoriesV2.find((cat) => cat.name === activeCategory)
-        //         ?.category_id,
+        category_id: activeCategory.category_id,
         minPrice: priceRange.min ? parseFloat(priceRange.min) : undefined,
         maxPrice: priceRange.max ? parseFloat(priceRange.max) : undefined,
       });
     }
   }, [categoriesV2, activeCategory, priceRange.min, priceRange.max, refresh]);
 
-  const handleCategoryChange = (category: number | null) => {
+  const handleCategoryChange = (category: Category) => {
     setActiveCategory(category);
   };
 
@@ -84,11 +75,10 @@ const Products = () => {
     const min = priceRange.min ? parseFloat(priceRange.min) : 0;
     const max = priceRange.max ? parseFloat(priceRange.max) : Infinity;
 
-    const filteredProducts = getProducts(
-      activeCategory === "all" ? undefined : activeCategory
-    ).filter((product) => product.price >= min && product.price <= max);
-
-    setProducts(filteredProducts);
+    setPriceRange({
+      min,
+      max,
+    });
   };
 
   const clearFilters = () => {
@@ -96,6 +86,8 @@ const Products = () => {
     setPriceRange({ min: "", max: "" });
     handleCategoryChange(activeCategory);
   };
+
+  const loaded = !loading;
 
   return (
     <Layout>
@@ -112,11 +104,11 @@ const Products = () => {
                     variant="ghost"
                     size="sm"
                     className={`w-full justify-start ${
-                      activeCategory === category.category_id
+                      activeCategory.category_id === category.category_id
                         ? "bg-accent text-tech-blue font-medium"
                         : ""
                     }`}
-                    onClick={() => handleCategoryChange(category.category_id)}
+                    onClick={() => handleCategoryChange(category)}
                   >
                     {category.name}
                   </Button>
@@ -180,9 +172,7 @@ const Products = () => {
           <div className="md:col-span-9 lg:col-span-10 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold">
-                  {activeCategory === "all" ? "All Products" : activeCategory}
-                </h1>
+                <h1 className="text-3xl font-bold">{activeCategory.name}</h1>
                 <p className="text-muted-foreground mt-1">
                   {loaded
                     ? `${displayedProducts.length} products available`
@@ -240,11 +230,11 @@ const Products = () => {
                   <TabsContent value="categories" className="pt-4 space-y-2">
                     {categories.map((category) => (
                       <Button
-                        key={category}
+                        key={category.category_id}
                         variant="ghost"
                         size="sm"
                         className={`w-full justify-start ${
-                          activeCategory === category
+                          activeCategory.category_id === category.category_id
                             ? "bg-accent text-tech-blue font-medium"
                             : ""
                         }`}
@@ -253,7 +243,7 @@ const Products = () => {
                           setFiltersVisible(false);
                         }}
                       >
-                        {category === "all" ? "All Products" : category}
+                        {category.name}
                       </Button>
                     ))}
                   </TabsContent>
