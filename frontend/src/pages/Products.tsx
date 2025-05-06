@@ -1,90 +1,102 @@
-
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import ProductCard from '@/components/products/ProductCard';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getProducts, getCategories } from '@/services/productService';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
+import React, { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import ProductCard from "@/components/products/ProductCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getProducts, getCategories } from "@/services/productService";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryCategory = searchParams.get('category');
+  const queryCategory = searchParams.get("category");
 
-  const {products: productsV2} = useProducts();
-  const {categories: categoriesV2} = useCategories();
-  
+  const { products: productsV2, refresh } = useProducts();
+  const { categories: categoriesV2 } = useCategories();
+
   const [products, setProducts] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(queryCategory || 'all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [activeCategory, setActiveCategory] = useState(
+    Number(queryCategory) || null
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [loaded, setLoaded] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(false);
 
-  const categories = useMemo(() => ['all', ...categoriesV2.map(category => category.name)], [categoriesV2]);
+  const categories = useMemo(
+    () => ["all", ...categoriesV2.map((category) => category.name)],
+    [categoriesV2]
+  );
 
   const displayedProducts = useMemo(() => {
     if (searchQuery) {
-      return productsV2.filter(product => 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      return productsV2.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     return productsV2;
-  }, [productsV2, searchQuery])
-  
+  }, [productsV2, searchQuery]);
+
   useEffect(() => {
     const fetchData = () => {
       setLoaded(false);
-      
+
       // Simulate API call
       setTimeout(() => {
-        let filteredProducts = queryCategory 
-          ? getProducts(queryCategory) 
+        let filteredProducts = queryCategory
+          ? getProducts(queryCategory)
           : getProducts();
-          
+
         setProducts(filteredProducts);
         setLoaded(true);
       }, 500);
     };
-    
+
     fetchData();
   }, [queryCategory]);
-  
-  const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
-    
-    if (category === 'all') {
-      setProducts(getProducts());
-      setSearchParams({});
-    } else {
-      setProducts(getProducts(category));
-      setSearchParams({ category });
+
+  useEffect(() => {
+    {
+      refresh({
+        // category_id:
+        //   activeCategory === "all"
+        //     ? undefined
+        //     : categoriesV2.find((cat) => cat.name === activeCategory)
+        //         ?.category_id,
+        minPrice: priceRange.min ? parseFloat(priceRange.min) : undefined,
+        maxPrice: priceRange.max ? parseFloat(priceRange.max) : undefined,
+      });
     }
+  }, [categoriesV2, activeCategory, priceRange.min, priceRange.max, refresh]);
+
+  const handleCategoryChange = (category: number | null) => {
+    setActiveCategory(category);
   };
-  
+
   const handlePriceFilter = () => {
     const min = priceRange.min ? parseFloat(priceRange.min) : 0;
     const max = priceRange.max ? parseFloat(priceRange.max) : Infinity;
-    
-    const filteredProducts = getProducts(activeCategory === 'all' ? undefined : activeCategory)
-      .filter(product => product.price >= min && product.price <= max);
-      
+
+    const filteredProducts = getProducts(
+      activeCategory === "all" ? undefined : activeCategory
+    ).filter((product) => product.price >= min && product.price <= max);
+
     setProducts(filteredProducts);
   };
-  
+
   const clearFilters = () => {
-    setSearchQuery('');
-    setPriceRange({ min: '', max: '' });
+    setSearchQuery("");
+    setPriceRange({ min: "", max: "" });
     handleCategoryChange(activeCategory);
   };
-  
+
   return (
     <Layout>
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -94,22 +106,26 @@ const Products = () => {
             <div>
               <h2 className="font-semibold mb-4">Categories</h2>
               <div className="space-y-2">
-                {categories.map(category => (
+                {categories.map((category) => (
                   <Button
-                    key={category}
+                    key={category.category_id}
                     variant="ghost"
                     size="sm"
-                    className={`w-full justify-start ${activeCategory === category ? 'bg-accent text-tech-blue font-medium' : ''}`}
-                    onClick={() => handleCategoryChange(category)}
+                    className={`w-full justify-start ${
+                      activeCategory === category.category_id
+                        ? "bg-accent text-tech-blue font-medium"
+                        : ""
+                    }`}
+                    onClick={() => handleCategoryChange(category.category_id)}
                   >
-                    {category === 'all' ? 'All Products' : category}
+                    {category.name}
                   </Button>
                 ))}
               </div>
             </div>
-            
+
             <Separator />
-            
+
             <div>
               <h2 className="font-semibold mb-4">Price Range</h2>
               <div className="space-y-3">
@@ -119,7 +135,9 @@ const Products = () => {
                       type="number"
                       placeholder="Min"
                       value={priceRange.min}
-                      onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                      onChange={(e) =>
+                        setPriceRange({ ...priceRange, min: e.target.value })
+                      }
                     />
                   </div>
                   <div>
@@ -127,13 +145,15 @@ const Products = () => {
                       type="number"
                       placeholder="Max"
                       value={priceRange.max}
-                      onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                      onChange={(e) =>
+                        setPriceRange({ ...priceRange, max: e.target.value })
+                      }
                     />
                   </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full"
                   onClick={handlePriceFilter}
                 >
@@ -141,13 +161,13 @@ const Products = () => {
                 </Button>
               </div>
             </div>
-            
+
             <Separator />
-            
+
             <div>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 className="w-full"
                 onClick={clearFilters}
               >
@@ -155,17 +175,21 @@ const Products = () => {
               </Button>
             </div>
           </div>
-          
+
           {/* Main content */}
           <div className="md:col-span-9 lg:col-span-10 space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold">{activeCategory === 'all' ? 'All Products' : activeCategory}</h1>
+                <h1 className="text-3xl font-bold">
+                  {activeCategory === "all" ? "All Products" : activeCategory}
+                </h1>
                 <p className="text-muted-foreground mt-1">
-                  {loaded ? `${displayedProducts.length} products available` : 'Loading products...'}
+                  {loaded
+                    ? `${displayedProducts.length} products available`
+                    : "Loading products..."}
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <form className="relative">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -177,9 +201,9 @@ const Products = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </form>
-                
-                <Button 
-                  variant="outline" 
+
+                <Button
+                  variant="outline"
                   size="icon"
                   className="md:hidden"
                   onClick={() => setFiltersVisible(!filtersVisible)}
@@ -188,44 +212,52 @@ const Products = () => {
                 </Button>
               </div>
             </div>
-            
+
             {/* Mobile filters */}
             {filtersVisible && (
               <div className="md:hidden bg-muted/50 rounded-lg p-4 border border-border animate-fade-in">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="font-semibold">Filters</h2>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     onClick={() => setFiltersVisible(false)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
-                
+
                 <Tabs defaultValue="categories">
                   <TabsList className="w-full">
-                    <TabsTrigger value="categories" className="flex-1">Categories</TabsTrigger>
-                    <TabsTrigger value="price" className="flex-1">Price</TabsTrigger>
+                    <TabsTrigger value="categories" className="flex-1">
+                      Categories
+                    </TabsTrigger>
+                    <TabsTrigger value="price" className="flex-1">
+                      Price
+                    </TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="categories" className="pt-4 space-y-2">
-                    {categories.map(category => (
+                    {categories.map((category) => (
                       <Button
                         key={category}
                         variant="ghost"
                         size="sm"
-                        className={`w-full justify-start ${activeCategory === category ? 'bg-accent text-tech-blue font-medium' : ''}`}
+                        className={`w-full justify-start ${
+                          activeCategory === category
+                            ? "bg-accent text-tech-blue font-medium"
+                            : ""
+                        }`}
                         onClick={() => {
                           handleCategoryChange(category);
                           setFiltersVisible(false);
                         }}
                       >
-                        {category === 'all' ? 'All Products' : category}
+                        {category === "all" ? "All Products" : category}
                       </Button>
                     ))}
                   </TabsContent>
-                  
+
                   <TabsContent value="price" className="pt-4 space-y-3">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
@@ -233,7 +265,12 @@ const Products = () => {
                           type="number"
                           placeholder="Min"
                           value={priceRange.min}
-                          onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                          onChange={(e) =>
+                            setPriceRange({
+                              ...priceRange,
+                              min: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <div>
@@ -241,13 +278,18 @@ const Products = () => {
                           type="number"
                           placeholder="Max"
                           value={priceRange.max}
-                          onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                          onChange={(e) =>
+                            setPriceRange({
+                              ...priceRange,
+                              max: e.target.value,
+                            })
+                          }
                         />
                       </div>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="w-full"
                       onClick={() => {
                         handlePriceFilter();
@@ -258,12 +300,12 @@ const Products = () => {
                     </Button>
                   </TabsContent>
                 </Tabs>
-                
+
                 <Separator className="my-4" />
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full"
                   onClick={() => {
                     clearFilters();
@@ -274,7 +316,7 @@ const Products = () => {
                 </Button>
               </div>
             )}
-            
+
             {/* Products grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {loaded ? (
@@ -290,35 +332,37 @@ const Products = () => {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-12">
-                    <h3 className="text-xl font-medium mb-2">No products found</h3>
+                    <h3 className="text-xl font-medium mb-2">
+                      No products found
+                    </h3>
                     <p className="text-muted-foreground mb-4">
                       Try changing your filters or search query
                     </p>
-                    <Button onClick={clearFilters}>
-                      Clear All Filters
-                    </Button>
+                    <Button onClick={clearFilters}>Clear All Filters</Button>
                   </div>
                 )
               ) : (
                 // Skeleton loaders
-                Array(8).fill(0).map((_, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-white rounded-xl overflow-hidden border border-border/40 animate-pulse"
-                  >
-                    <div className="h-48 bg-gray-200" />
-                    <div className="p-4">
-                      <div className="w-16 h-5 bg-gray-200 rounded-full mb-3" />
-                      <div className="h-6 bg-gray-200 rounded mb-2 w-3/4" />
-                      <div className="h-4 bg-gray-200 rounded mb-2" />
-                      <div className="h-4 bg-gray-200 rounded mb-2 w-4/5" />
-                      <div className="flex justify-between items-center mt-4">
-                        <div className="w-16 h-6 bg-gray-200 rounded" />
-                        <div className="w-20 h-8 bg-gray-200 rounded" />
+                Array(8)
+                  .fill(0)
+                  .map((_, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl overflow-hidden border border-border/40 animate-pulse"
+                    >
+                      <div className="h-48 bg-gray-200" />
+                      <div className="p-4">
+                        <div className="w-16 h-5 bg-gray-200 rounded-full mb-3" />
+                        <div className="h-6 bg-gray-200 rounded mb-2 w-3/4" />
+                        <div className="h-4 bg-gray-200 rounded mb-2" />
+                        <div className="h-4 bg-gray-200 rounded mb-2 w-4/5" />
+                        <div className="flex justify-between items-center mt-4">
+                          <div className="w-16 h-6 bg-gray-200 rounded" />
+                          <div className="w-20 h-8 bg-gray-200 rounded" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))
               )}
             </div>
           </div>
