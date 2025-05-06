@@ -3,12 +3,27 @@ import { DataTypes } from 'sequelize';
 
 // Define the Shipment model
 export const Shipment = sequelize.define('Shipment', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    order_id: { type: DataTypes.INTEGER, allowNull: false },
-    courier: { type: DataTypes.STRING, allowNull: false },
-    tracking_number: { type: DataTypes.STRING, allowNull: false },
-    status: { type: DataTypes.STRING, allowNull: false }
-}, { tableName: 'shipments', timestamps: false });
+    
+id:{
+    type:DataTypes.INTEGER,
+    primaryKey:true,
+    autoIncrement:true
+},
+courier:{
+    type:DataTypes.STRING(100),
+    allowNull: false
+},
+status:{
+    type:DataTypes.STRING,
+    allowNull: false
+},
+tracking_number:{
+    type:DataTypes.STRING,
+    allowNull: false
+}
+}, { tableName: 'shipments',
+     timestamps: true, });
+
 
 // Add a new shipment
 export const addShipment = async (orderId, courier, trackingNumber, status) => {
