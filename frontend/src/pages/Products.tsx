@@ -26,7 +26,6 @@ const Products = () => {
     (category: Category) => category.category_id === queryCategoryId
   );
 
-  const [products, setProducts] = useState([]);
   const [activeCategory, setActiveCategory] = useState(
     queryCategory ?? ({ category_id: null, name: "All Products" } as Category)
   );
@@ -56,6 +55,17 @@ const Products = () => {
 
     return productsV2;
   }, [productsV2, searchQuery]);
+
+  useEffect(() => {
+    if (queryCategory) {
+      setActiveCategory(queryCategory);
+    } else {
+      setActiveCategory({
+        category_id: null,
+        name: "All Products",
+      } as Category);
+    }
+  }, [queryCategory]);
 
   useEffect(() => {
     {
@@ -88,6 +98,9 @@ const Products = () => {
   };
 
   const loaded = !loading;
+
+  console.log(queryCategory);
+  console.log(activeCategory);
 
   return (
     <Layout>
