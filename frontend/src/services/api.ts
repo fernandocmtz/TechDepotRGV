@@ -1,5 +1,4 @@
 import {
-  Category,
   Product
 } from "./types";
 
@@ -22,22 +21,3 @@ export function api_get_all_products() {
       });
   });
 }
-
-export function api_get_all_categories() {
-  return new Promise<Category[]>((resolve, reject) => {
-    fetch(`${url}/api/categories`, {
-      method: "GET",
-    })
-      .then((res) => {
-        if (res.ok) {
-          resolve(res.json());
-        } else {
-          throw res;
-        }
-      })
-      .catch((err) => {
-        reject(err);
-      });
-  });
-}
-

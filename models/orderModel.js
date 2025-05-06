@@ -3,35 +3,11 @@ import { DataTypes } from 'sequelize';
 
 // Define Order model
 export const Order = sequelize.define('Order', {
-    id:{
-        type:DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true
-    },
-    user_id: {
-        type:DataTypes.INTEGER,
-        allowNull: false,
-        references:{
-            model:'users',
-            key:'user_id'
-        }
-    },
-    address_id: {
-        type:DataTypes.INTEGER,
-        allowNull: false,
-        //needs foreign key 
-        // references:{
-        //     model:'address',
-        //     key:'address_id'
-        //}
-    },
-    status: {
-        type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'),
-        allowNull: false
-    }
-}, { tableName: 'orders',
-     timestamps: true });
-
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    address_id: { type: DataTypes.INTEGER, allowNull: false },
+    status: { type: DataTypes.STRING, allowNull: false }
+}, { tableName: 'orders', timestamps: false });
 
 // Create a new order
 export const createOrder = async (userId, addressId, status) => {
