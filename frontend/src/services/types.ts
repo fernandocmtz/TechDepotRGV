@@ -11,3 +11,10 @@ export type Product = {
     name: string;
   }
 }
+
+export type Category = {
+  id: number;
+  name: string;
+  productCount: number;
+  image_url: string;
+}
