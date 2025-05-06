@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Navbar = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,6 +47,7 @@ const Navbar = () => {
                 { text: "Products", path: "/products" },
                 { text: "Categories", path: "/categories" },
                 isAuthenticated && { text: "Profile", path: "/profile" },
+                isAuthenticated && { text: "Logout", path: "/" },
                 !isAuthenticated && { text: "Sign In", path: "/signin" },
               ]
                 .filter(Boolean)
@@ -60,6 +61,7 @@ const Navbar = () => {
                         ? "text-tech-blue"
                         : "text-tech-dark/80"
                     )}
+                    onClick={link.text === "Logout" ? logout : undefined}
                   >
                     {link.text}
                     {isActive(link.path) && (
