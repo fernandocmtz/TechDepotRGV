@@ -1,0 +1,103 @@
+// src/auth/AuthContext.tsx
+import React, { useState, useEffect, ReactNode } from "react";
+
+import { AuthContext } from "./context";
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+const url = import.meta.env.VITE_API_URL;
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [accessToken, setAccessToken] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Silent refresh on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${url}/api/auth/refresh_token`, {
+          method: "POST",
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.accessToken) {
+          setAccessToken(data.accessToken);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const res = await fetch(`${url}/api/auth/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    setAccessToken(data.accessToken || "");
+    return true;
+  };
+
+  const logout = async (): Promise<void> => {
+    await fetch(`${url}/api/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+    setAccessToken("");
+  };
+
+  const fetchAuth = async (
+    url: string,
+    options: RequestInit = {}
+  ): Promise<Response> => {
+    // Wait for initial refresh
+    if (loading) {
+      await new Promise<void>((resolve) => {
+        const iv = setInterval(() => {
+          if (!loading) {
+            clearInterval(iv);
+            resolve();
+          }
+        }, 50);
+      });
+    }
+
+    const makeCall = () =>
+      fetch(url, {
+        ...options,
+        credentials: "include",
+        headers: {
+          ...(options.headers as Record<string, string>),
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+    let res = await makeCall();
+    if (res.status === 401) {
+      const ref = await fetch(`${url}/api/auth/refresh_token`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await ref.json();
+      setAccessToken(data.accessToken || "");
+      res = await makeCall();
+    }
+    return res;
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{ accessToken, loading, login, logout, fetchAuth }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
