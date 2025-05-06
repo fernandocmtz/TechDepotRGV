@@ -43,7 +43,12 @@ export const getFilteredProducts = async (req, res, next) => {
     }
 
     // Category filter (join with Category model)
-    const includeClause = [];
+    const includeClause = [
+      {
+        model: Category,
+        attributes: ["name"], // Optional: only fetch the 'name' column
+      },
+    ];
     if (category_id) {
       includeClause.push({
         model: Category,
