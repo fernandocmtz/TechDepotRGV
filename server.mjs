@@ -58,7 +58,7 @@ app.listen(PORT, async () => {
     console.log("✅ All models were associated successfully.");
 
     // Recreate all tables from models
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
     console.log("✅ All models were synchronized (force: true)");
   } catch (error) {
     console.error("Unable to connect to the database:", error);
