@@ -30,9 +30,8 @@ const signInSchema = z.object({
 // Define validation schema for sign-up form
 const signUpSchema = z
   .object({
-    fullName: z
-      .string()
-      .min(3, { message: "Full name must be at least 3 characters" }),
+    firstName: z.string().min(0, { message: "First name must not be empty" }),
+    lastName: z.string().min(0, { message: "Last name must not be empty" }),
     email: z.string().email({ message: "Please enter a valid email address" }),
     username: z
       .string()
@@ -58,7 +57,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("signin");
 
-  const { login } = useAuth();
+  const { login, register } = useAuth();
 
   // Initialize forms
   const signInForm = useForm<z.infer<typeof signInSchema>>({
@@ -73,7 +72,8 @@ const SignIn = () => {
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      fullName: "",
+      firstName: "",
+      lastName: "",
       email: "",
       username: "",
       password: "",
@@ -105,19 +105,23 @@ const SignIn = () => {
     }
   };
 
-  const onSignUpSubmit = (values: z.infer<typeof signUpSchema>) => {
-    // This would be replaced with actual API call
-    console.log("Sign up submitted:", values);
+  const onSignUpSubmit = async (values: z.infer<typeof signUpSchema>) => {
+    const { ok, message } = await register(
+      values.username,
+      values.firstName,
+      values.lastName,
+      values.email,
+      values.password
+    );
 
-    // Simulate API call with timeout
-    toast.loading("Creating your account...");
-
-    setTimeout(() => {
+    if (ok) {
       toast.dismiss();
       toast.success("Account created successfully!");
       setActiveTab("signin");
       signInForm.setValue("username", values.username);
-    }, 1500);
+    } else {
+      toast.error(message || "Registration error occurred");
+    }
   };
 
   return (
@@ -231,15 +235,36 @@ const SignIn = () => {
                 >
                   <FormField
                     control={signUpForm.control}
-                    name="fullName"
+                    name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>First Name</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
-                              placeholder="John Doe"
+                              placeholder="John"
+                              className="pl-10"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signUpForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder="Doe"
                               className="pl-10"
                               {...field}
                             />

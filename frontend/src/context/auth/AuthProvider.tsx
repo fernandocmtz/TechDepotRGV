@@ -33,10 +33,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })();
   }, []);
 
+  const register = async (username, firstName, lastName, email, password) => {
+    const res = await fetch(`${url}/api/auth/register`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, firstName, lastName, email, password }),
+    });
+    const data = await res.json();
+    return { ok: res.ok, message: data.message ?? "" };
+  };
+
   const login = async (
     username: string,
     password: string
-  ): Promise<{ok: boolean, message: string}> => {
+  ): Promise<{ ok: boolean; message: string }> => {
     const res = await fetch(`${url}/api/auth/login`, {
       method: "POST",
       credentials: "include",
@@ -44,9 +55,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       body: JSON.stringify({ username, password }),
     });
     const data = await res.json();
-    if (!res.ok) return {ok: false, message: data.message ?? ""};
+    if (!res.ok) return { ok: false, message: data.message ?? "" };
     setAccessToken(data.accessToken || "");
-    return {ok: true, message: data.message ?? ""};
+    return { ok: true, message: data.message ?? "" };
   };
 
   const logout = async (): Promise<void> => {
@@ -104,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading,
         login,
         logout,
+        register,
         fetchAuth,
       }}
     >
