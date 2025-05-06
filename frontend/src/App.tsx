@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/auth/AuthProvider";
+import { CartProvider } from "./context/cart/CartProvider";
 
 const queryClient = new QueryClient();
 
@@ -33,24 +34,26 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner position="top-right" closeButton />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/categories" element={<Categories />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <CartProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner position="top-right" closeButton />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </CartProvider>
     </AuthProvider>
   );
 };
