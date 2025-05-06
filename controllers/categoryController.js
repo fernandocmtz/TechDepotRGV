@@ -1,4 +1,6 @@
 import { Category } from "../models/categoryModel.js";
+import { sequelize } from "../config/db.js";
+import { Product } from "../models/productModel.js";
 
 export const getAllCategories = async () => {
   return await Category.findAll({
