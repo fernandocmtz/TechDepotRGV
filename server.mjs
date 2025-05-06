@@ -6,18 +6,20 @@ import dotenv from "dotenv";
 import { sequelize } from "./config/db.js";
 
 // Import Routes
-import userRoutes from "./routes/userRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import inventoryRoutes from "./routes/inventoryRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import returnRoutes from "./routes/returnRoutes.js";
-import shipmentRoutes from "./routes/shipmentRoutes.js";
-import authRoutes from "./routes/authRoutes.js";
+import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import shipmentRoutes from './routes/shipmentRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 // Model Associations
-import { associateModels } from "./models/associations.js"; // Ensure associations are set up
+import {associateModels} from './models/associations.js'; // Ensure associations are set up
+// Import Error Handler
+import errorHandler from './middleware/errorHandler.js';
 
 // Load environment variables
 dotenv.config();
@@ -48,27 +50,23 @@ app.use("/api/returns", returnRoutes);
 app.use("/api/shipments", shipmentRoutes);
 app.use("/api/auth", authRoutes);
 
-// Function to start server after ensuring DB connection
-async function startServer() {
+// Error handling middleware
+app.use(errorHandler);
+
+// Start server
+const PORT = process.env.PORT || 5001;
+
+app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
   try {
     await sequelize.authenticate();
-    console.log("✅ Database connected successfully.");
+    console.log('Database connected successfully.');
 
-    associateModels(); // Create model associations
-    console.log("✅ Models associated successfully.");
+    // Recreate all tables from models
+    await sequelize.sync({ force: true });
+    console.log('✅ All models were synchronized (force: true)');
 
-    await sequelize.sync({ alter: true }); // ✅ Ensures tables are created
-    console.log("✅ Tables synchronized.");
-
-    const PORT = process.env.PORT || 5001;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
   } catch (error) {
-    console.error("❌ Database connection failed:", error);
-    process.exit(1); // Exit if DB connection fails
+    console.error('Unable to connect to the database:', error);
   }
-}
-
-// Start the server
-startServer();
+});

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import ProductCard from '@/components/products/ProductCard';
@@ -9,18 +9,24 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getProducts, getCategories } from '@/services/productService';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useProducts } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryCategory = searchParams.get('category');
+
+  const {products: productsV2} = useProducts();
+  const {categories: categoriesV2} = useCategories();
   
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(queryCategory || 'all');
   const [searchQuery, setSearchQuery] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [loaded, setLoaded] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(false);
+
+  const categories = useMemo(() => ['all', ...categoriesV2.map(category => category.name)], [categoriesV2]);
   
   useEffect(() => {
     const fetchData = () => {
@@ -28,12 +34,10 @@ const Products = () => {
       
       // Simulate API call
       setTimeout(() => {
-        const allCategories = getCategories();
         let filteredProducts = queryCategory 
           ? getProducts(queryCategory) 
           : getProducts();
           
-        setCategories(['all', ...allCategories]);
         setProducts(filteredProducts);
         setLoaded(true);
       }, 500);
@@ -164,7 +168,7 @@ const Products = () => {
               <div>
                 <h1 className="text-3xl font-bold">{activeCategory === 'all' ? 'All Products' : activeCategory}</h1>
                 <p className="text-muted-foreground mt-1">
-                  {loaded ? `${products.length} products available` : 'Loading products...'}
+                  {loaded ? `${productsV2.length} products available` : 'Loading products...'}
                 </p>
               </div>
               
@@ -280,10 +284,10 @@ const Products = () => {
             {/* Products grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {loaded ? (
-                products.length > 0 ? (
-                  products.map((product, index) => (
+                productsV2.length > 0 ? (
+                  productsV2.map((product, index) => (
                     <div
-                      key={product.id}
+                      key={product.product_id}
                       className="animate-fade-up"
                       style={{ animationDelay: `${(index % 4) * 100}ms` }}
                     >
