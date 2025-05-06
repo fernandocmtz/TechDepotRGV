@@ -27,6 +27,17 @@ const Products = () => {
   const [filtersVisible, setFiltersVisible] = useState(false);
 
   const categories = useMemo(() => ['all', ...categoriesV2.map(category => category.name)], [categoriesV2]);
+
+  const displayedProducts = useMemo(() => {
+    if (searchQuery) {
+      return productsV2.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return productsV2;
+  }, [productsV2, searchQuery])
   
   useEffect(() => {
     const fetchData = () => {
@@ -56,23 +67,6 @@ const Products = () => {
       setProducts(getProducts(category));
       setSearchParams({ category });
     }
-  };
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!searchQuery.trim()) {
-      return handleCategoryChange(activeCategory);
-    }
-    
-    const query = searchQuery.toLowerCase();
-    const filteredProducts = getProducts(activeCategory === 'all' ? undefined : activeCategory)
-      .filter(product => 
-        product.name.toLowerCase().includes(query) || 
-        product.description.toLowerCase().includes(query)
-      );
-      
-    setProducts(filteredProducts);
   };
   
   const handlePriceFilter = () => {
@@ -168,12 +162,12 @@ const Products = () => {
               <div>
                 <h1 className="text-3xl font-bold">{activeCategory === 'all' ? 'All Products' : activeCategory}</h1>
                 <p className="text-muted-foreground mt-1">
-                  {loaded ? `${productsV2.length} products available` : 'Loading products...'}
+                  {loaded ? `${displayedProducts.length} products available` : 'Loading products...'}
                 </p>
               </div>
               
               <div className="flex items-center gap-2">
-                <form onSubmit={handleSearch} className="relative">
+                <form className="relative">
                   <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
@@ -285,7 +279,7 @@ const Products = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {loaded ? (
                 productsV2.length > 0 ? (
-                  productsV2.map((product, index) => (
+                  displayedProducts.map((product, index) => (
                     <div
                       key={product.product_id}
                       className="animate-fade-up"
