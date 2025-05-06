@@ -127,3 +127,11 @@ export const refreshToken = async (req, res) => {
     .cookie("jid", newRt, cookieOptions)
     .json({ ok: true, accessToken: newAt });
 };
+
+export const logout = async (req, res) => {
+  const token = req.cookies.jid;
+  if (token) {
+    await RefreshToken.destroy({ where: { token } });
+  }
+  res.clearCookie("jid", cookieOptions).json({ ok: true });
+};
