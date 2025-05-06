@@ -71,15 +71,6 @@ const Navbar = () => {
                 ))}
             </nav>
 
-            <div className="relative w-64 hidden lg:block">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="pl-10 w-full bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-tech-blue"
-              />
-            </div>
-
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
