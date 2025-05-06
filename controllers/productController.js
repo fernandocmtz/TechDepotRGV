@@ -1,5 +1,6 @@
 import { Product } from "../models/productModel.js";
 import { Category } from "../models/categoryModel.js";
+import { Op } from "sequelize";
 
 export const getAllProducts = async (req, res, next) => {
   try {
@@ -22,6 +23,46 @@ export const getProductById = async (req, res, next) => {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
     res.json(product);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getFilteredProducts = async (req, res, next) => {
+  try {
+    const { minPrice, maxPrice, category_id } = req.body;
+    const whereClause = {};
+
+    // Price filter
+    if (minPrice || maxPrice) {
+      whereClause.price = {};
+      if (minPrice !== undefined)
+        whereClause.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice !== undefined)
+        whereClause.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    // Category filter (join with Category model)
+    const includeClause = [
+      {
+        model: Category,
+        attributes: ["name"], // Optional: only fetch the 'name' column
+      },
+    ];
+    if (category_id) {
+      includeClause.push({
+        model: Category,
+        where: { category_id },
+        attributes: [],
+      });
+    }
+
+    const products = await Product.findAll({
+      where: whereClause,
+      include: includeClause,
+    });
+
+    res.json(products);
   } catch (err) {
     next(err);
   }
