@@ -24,9 +24,15 @@ dotenv.config();
 
 // Initialize Express App
 const app = express();
-
 // Middleware
-app.use(cors());
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:8080";
+
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN, // no wildcard!
+    credentials: true, // <–– allows Set-Cookie and Cookie headers
+  })
+);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
@@ -51,6 +57,7 @@ async function startServer() {
     associateModels(); // Create model associations
     console.log("✅ Models associated successfully.");
 
+    await sequelize.sync({ alter: true }); // ✅ Ensures tables are created
     console.log("✅ Tables synchronized.");
 
     const PORT = process.env.PORT || 5001;
