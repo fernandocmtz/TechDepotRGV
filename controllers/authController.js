@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 import { RefreshToken } from "../models/authModel.js";
-import { sequelize } from "../config/db.js";
+import { Op } from "sequelize";
 
 function createAccessToken({ payload }) {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
@@ -47,7 +47,7 @@ export const login = async (req, res) => {
     await RefreshToken.create({
       token: rt,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      userId: user.id,
+      user_id: user.user_id,
     });
 
     res.cookie("jid", rt, cookieOptions).json({ accessToken: at });
@@ -98,7 +98,7 @@ export const refreshToken = async (req, res) => {
   const row = await RefreshToken.findOne({
     where: {
       token: oldToken,
-      expiresAt: { [sequelize.Op.gt]: new Date() },
+      expiresAt: { [Op.gt]: new Date() },
     },
   });
   if (!row) return res.status(401).json({ ok: false, accessToken: "" });
@@ -107,7 +107,7 @@ export const refreshToken = async (req, res) => {
   await row.destroy();
 
   // issue new pair
-  const user = await User.findByPk(row.userId);
+  const user = await User.findByPk(row.user_id);
 
   const payload = {
     id: user.user_id,
@@ -120,7 +120,7 @@ export const refreshToken = async (req, res) => {
   await RefreshToken.create({
     token: newRt,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    userId: user.id,
+    user_id: user.user_id,
   });
 
   res

@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register } from '../controllers/authController.js';
+import { login, register, refreshToken } from '../controllers/authController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 import { authorizeRoles } from '../middleware/roleMiddleware.js';
 
@@ -8,6 +8,7 @@ const router = express.Router();
 //  Public routes
 router.post('/login', login);
 router.post('/register', register);
+router.post('/refresh_token', refreshToken)
 
 //  Protected routes (requires a valid JWT)
 router.get('/protected', authenticateUser, (req, res) => {

@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
@@ -28,6 +29,7 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+app.use(cookieParser());
 
 // API Routes
 app.use("/api/users", userRoutes);
