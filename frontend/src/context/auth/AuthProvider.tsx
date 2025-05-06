@@ -33,17 +33,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (
+    username: string,
+    password: string
+  ): Promise<{ok: boolean, message: string}> => {
     const res = await fetch(`${url}/api/auth/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, password }),
     });
-    if (!res.ok) return false;
     const data = await res.json();
+    if (!res.ok) return {ok: false, message: data.message ?? ""};
     setAccessToken(data.accessToken || "");
-    return true;
+    return {ok: true, message: data.message ?? ""};
   };
 
   const logout = async (): Promise<void> => {
