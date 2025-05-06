@@ -87,6 +87,8 @@ const SignIn = () => {
     const { ok, message } = await login(values.username, values.password);
 
     if (ok) {
+      toast.dismiss();
+      toast.success("Signed in successfully!");
       navigate("/");
     } else {
       signInForm.setError("username", {
@@ -96,8 +98,10 @@ const SignIn = () => {
 
       signInForm.setError("password", {
         type: "manual",
-        message,
+        message: "",
       });
+
+      toast.error(message || "Sign In error occurred");
     }
   };
 
@@ -196,13 +200,15 @@ const SignIn = () => {
 
                   <div className="flex items-center justify-between">
                     <Button
+                      type="button"
                       variant="link"
                       className="px-0"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.preventDefault();
                         toast.info(
-                          "Password reset functionality would be implemented here"
-                        )
-                      }
+                          "Password reset functionality would be implemented here, with a reset password email sent to the user."
+                        );
+                      }}
                     >
                       Forgot password?
                     </Button>
