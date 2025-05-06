@@ -1,7 +1,4 @@
-import {
-  Category,
-  Product
-} from "./types";
+import { Category, Product } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -9,6 +6,28 @@ export function api_get_all_products() {
   return new Promise<Product[]>((resolve, reject) => {
     fetch(`${url}/api/products`, {
       method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_get_filtered_products(filter) {
+  return new Promise<Product[]>((resolve, reject) => {
+    fetch(`${url}/api/products/filter`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(filter),
     })
       .then((res) => {
         if (res.ok) {
@@ -40,4 +59,3 @@ export function api_get_all_categories() {
       });
   });
 }
-

@@ -29,7 +29,7 @@ const Categories = () => {
             ? categories.map((category, index) => (
                 <Link
                   key={category.category_id}
-                  to={`/products?category=${category.name}`}
+                  to={`/products?category=${category.category_id}`}
                   className="group relative overflow-hidden rounded-xl aspect-[4/3] animate-fade-up"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
