@@ -5,6 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product } from "@/services/types";
 import { useCart } from "@/context/cart/useCart";
+import { toast } from "@/hooks/use-toast";
 
 export interface ProductProps {
   id: string;
@@ -24,6 +25,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart(product.product_id, 1);
+
+    toast({
+      title: "Success",
+      description: "Added to cart",
+    });
+  };
 
   return (
     <div
@@ -68,9 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
             size="sm"
             variant="outline"
             className="hover:bg-tech-blue hover:text-white transition-colors"
-            onClick={() => {
-              addToCart(product.product_id, 1);
-            }}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Add
