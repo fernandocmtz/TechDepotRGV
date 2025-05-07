@@ -15,6 +15,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import returnRoutes from "./routes/returnRoutes.js";
 import shipmentRoutes from "./routes/shipmentRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import addressRoutes from "./routes/addressRoutes.js";
 
 // Model Associations
 import { associateModels } from "./models/associations.js"; // Ensure associations are set up
@@ -49,6 +50,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/shipments", shipmentRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/address", addressRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
