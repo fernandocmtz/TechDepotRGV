@@ -15,6 +15,22 @@ const Cart = () => {
   const { cartItems: cartItemsV2, updateCartItem, removeFromCart } = useCart();
   const { products, refresh, loading, clear } = useProducts();
 
+  const [step, setStep] = useState<"address" | "payment">("address");
+
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [city, setCity] = useState("");
+  const [stateRegion, setStateRegion] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [country, setCountry] = useState("United States");
+
+  const [paymentName, setPaymentName] = useState("");
+  const [paymentCardNumber, setPaymentCardNumber] = useState("");
+  const [paymentExpiry, setPaymentExpiry] = useState("");
+  const [paymentCvv, setPaymentCvv] = useState("");
+
   const productIds = useMemo(
     () => cartItemsV2.map((item) => item.product_id),
     [cartItemsV2]
@@ -70,11 +86,37 @@ const Cart = () => {
   const total = subtotal + shipping + tax;
 
   const handleCheckout = () => {
-    toast({
-      title: "Success",
-      description: "Checkout functionality would go here in a real app",
-    });
+    if (mergedProducts.length === 0) {
+      toast({
+        title: "Error",
+        description: "Your cart is empty.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setShowCheckoutModal(true);
   };
+
+  const addresses = [];
+
+  const validAddress =
+    (selectedAddress !== "new" && selectedAddress) ||
+    (addressLine1.trim() &&
+      city.trim() &&
+      stateRegion.trim() &&
+      postalCode.trim() &&
+      postalCode.length == 5);
+
+  const validPayment =
+    paymentName.trim() &&
+    paymentCardNumber.trim() &&
+    paymentCardNumber.length === 16 &&
+    paymentExpiry.trim() &&
+    paymentExpiry.length === 5 &&
+    paymentExpiry.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/) &&
+    paymentCvv.trim() &&
+    paymentCvv.length === 3;
 
   return (
     <Layout>
@@ -254,6 +296,155 @@ const Cart = () => {
           </div>
         )}
       </div>
+
+      {showCheckoutModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">
+              {step === "address" ? "Enter Address" : "Payment Information"}
+            </h2>
+
+            {step === "address" && (
+              <>
+                <label className="block mb-2">Select Address</label>
+                <select
+                  className="w-full border p-2 mb-4"
+                  value={selectedAddress}
+                  onChange={(e) => setSelectedAddress(e.target.value)}
+                >
+                  <option value="">-- Choose an address --</option>
+                  {addresses.map((addr, idx) => (
+                    <option key={idx} value={addr}>
+                      {addr}
+                    </option>
+                  ))}
+                  <option value="new">Enter New Address</option>
+                </select>
+
+                {selectedAddress === "new" && (
+                  <div className="space-y-3 mb-4">
+                    <input
+                      className="w-full border p-2"
+                      placeholder="Address Line 1*"
+                      value={addressLine1}
+                      onChange={(e) => setAddressLine1(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="Address Line 2"
+                      value={addressLine2}
+                      onChange={(e) => setAddressLine2(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="City*"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="State / Region*"
+                      value={stateRegion}
+                      onChange={(e) => setStateRegion(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="Postal Code*"
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="Country"
+                      value={country}
+                      disabled
+                    />
+                    <div>* Required</div>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="text-gray-600"
+                    onClick={() => setShowCheckoutModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded text-white ${
+                      validAddress
+                        ? "bg-blue-500"
+                        : "bg-gray-300 cursor-not-allowed"
+                    }`}
+                    disabled={!validAddress}
+                    onClick={() => setStep("payment")}
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+            )}
+
+            {step === "payment" && (
+              <>
+                <div className="space-y-3 mb-4">
+                  <input
+                    className="w-full border p-2"
+                    placeholder="Name on Card"
+                    value={paymentName}
+                    onChange={(e) => setPaymentName(e.target.value)}
+                  />
+                  <input
+                    className="w-full border p-2"
+                    placeholder="Card Number"
+                    maxLength={16}
+                    value={paymentCardNumber}
+                    onChange={(e) => setPaymentCardNumber(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      className="w-full border p-2"
+                      placeholder="MM/YY"
+                      maxLength={5}
+                      value={paymentExpiry}
+                      onChange={(e) => setPaymentExpiry(e.target.value)}
+                    />
+                    <input
+                      className="w-full border p-2"
+                      placeholder="CVV"
+                      maxLength={4}
+                      value={paymentCvv}
+                      onChange={(e) => setPaymentCvv(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-between gap-2">
+                  <button
+                    className="text-gray-600"
+                    onClick={() => setStep("address")}
+                  >
+                    Back
+                  </button>
+                  <button
+                    className={`px-4 py-2 rounded text-white ${
+                      validPayment
+                        ? " bg-green-500"
+                        : "bg-gray-300 cursor-not-allowed"
+                    }`}
+                    onClick={() => {
+                      /* handle final submit */
+                    }}
+                    disabled={!validPayment}
+                  >
+                    Confirm Payment
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
