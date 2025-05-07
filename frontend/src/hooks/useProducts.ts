@@ -20,6 +20,8 @@ export function useProducts() {
         : await api_get_all_products();
 
       setProducts(data);
+
+      return data;
     } catch (err) {
       setError(err as Error);
     } finally {
