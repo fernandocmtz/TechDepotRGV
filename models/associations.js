@@ -3,6 +3,8 @@ import { User } from "./userModel.js";
 import { Product } from "./productModel.js";
 import { Category } from "./categoryModel.js";
 import { Inventory } from "./inventoryModel.js";
+import { User } from "./userModel.js";
+import { Address } from "./addressModel.js";
 
 export const associateModels = () => {
   RefreshToken.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
@@ -22,5 +24,17 @@ export const associateModels = () => {
 
   Inventory.belongsTo(Product, {
     foreignKey: "product_id",
+  });
+
+  Address.belongsTo(User, {
+    foreignKey: {
+      name: "user_id",
+      allowNull: false,
+    },
+    onDelete: "CASCADE",
+  });
+
+  User.hasMany(Address, {
+    foreignKey: "user_id",
   });
 };

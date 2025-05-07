@@ -1,5 +1,6 @@
 import { sequelize } from "../config/db.js";
 import { DataTypes } from "sequelize";
+import { User } from "./userModel.js";
 
 export const Address = sequelize.define(
   "Address",
@@ -27,6 +28,14 @@ export const Address = sequelize.define(
     country: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: "user_id",
+      },
     },
   },
   {
