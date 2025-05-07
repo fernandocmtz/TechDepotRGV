@@ -1,16 +1,30 @@
 import { Product } from "../models/productModel.js";
 import { Category } from "../models/categoryModel.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import { Inventory } from "../models/inventoryModel.js";
 
 export const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll({
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+            "inventory_count",
+          ],
+        ],
+      },
       include: [
         {
           model: Category,
-          attributes: ["name"], // Optional: only fetch the 'name' column
+          attributes: ["name"],
+        },
+        {
+          model: Inventory,
+          attributes: [],
         },
       ],
+      group: ["Product.product_id", "Category.category_id"],
     });
     res.json(products);
   } catch (err) {
