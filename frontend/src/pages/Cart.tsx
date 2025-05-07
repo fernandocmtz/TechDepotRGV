@@ -37,6 +37,24 @@ const Cart = () => {
   );
 
   useEffect(() => {
+    if (!showCheckoutModal) {
+      setStep("address");
+      setSelectedAddress("");
+      setAddressLine1("");
+      setAddressLine2("");
+      setCity("");
+      setStateRegion("");
+      setPostalCode("");
+      setCountry("United States");
+
+      setPaymentName("");
+      setPaymentCardNumber("");
+      setPaymentExpiry("");
+      setPaymentCvv("");
+    }
+  }, [showCheckoutModal]);
+
+  useEffect(() => {
     if (productIds.length === 0) {
       clear();
       return;
