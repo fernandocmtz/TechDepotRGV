@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 // Define Order model
 export const Order = sequelize.define('Order', {
-    id:{
+    order_id:{
         type:DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
