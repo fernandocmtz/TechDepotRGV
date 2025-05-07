@@ -10,12 +10,14 @@ export type Product = {
   Category: {
     name: string;
   };
+  inventory_count: number;
 };
 
 export type ProductFilters = {
   category_id?: number;
   minPrice?: number;
   maxPrice?: number;
+  product_ids?: number[];
 };
 
 export type Category = {
@@ -23,4 +25,10 @@ export type Category = {
   name: string;
   productCount: number;
   image_url: string;
+};
+
+export type CartItem = {
+  product_id: number;
+  quantity: number;
+  product_inventory: number;
 };

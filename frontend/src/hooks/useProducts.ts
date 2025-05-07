@@ -20,6 +20,8 @@ export function useProducts() {
         : await api_get_all_products();
 
       setProducts(data);
+
+      return data;
     } catch (err) {
       setError(err as Error);
     } finally {
@@ -27,9 +29,15 @@ export function useProducts() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  const clearProducts = useCallback(() => {
+    setProducts([]);
+  }, []);
 
-  return { products, loading, error, refresh: fetchProducts };
+  return {
+    products,
+    loading,
+    error,
+    refresh: fetchProducts,
+    clear: clearProducts,
+  };
 }

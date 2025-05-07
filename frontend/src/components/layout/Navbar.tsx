@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth/useAuth";
+import { useCart } from "@/context/cart/useCart";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
+  const { cartItems } = useCart();
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,6 +25,11 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const cartItemCount = cartItems.reduce(
+    (count, item) => count + item.quantity,
+    0
+  );
 
   return (
     <header
@@ -75,7 +82,7 @@ const Navbar = () => {
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-tech-blue text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
+                  {cartItemCount}
                 </span>
               </Button>
             </Link>

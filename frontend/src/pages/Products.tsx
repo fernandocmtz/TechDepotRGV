@@ -18,6 +18,10 @@ const Products = () => {
   const { products: productsV2, refresh, loading } = useProducts();
   const { categories: categoriesV2 } = useCategories();
 
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
   const queryCategoryId = searchParams.get("category")
     ? Number(searchParams.get("category"))
     : null;

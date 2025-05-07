@@ -1,16 +1,30 @@
 import { Product } from "../models/productModel.js";
 import { Category } from "../models/categoryModel.js";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import { Inventory } from "../models/inventoryModel.js";
 
 export const getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll({
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+            "inventory_count",
+          ],
+        ],
+      },
       include: [
         {
           model: Category,
-          attributes: ["name"], // Optional: only fetch the 'name' column
+          attributes: ["name"],
+        },
+        {
+          model: Inventory,
+          attributes: [],
         },
       ],
+      group: ["Product.product_id", "Category.category_id"],
     });
     res.json(products);
   } catch (err) {
@@ -30,8 +44,15 @@ export const getProductById = async (req, res, next) => {
 
 export const getFilteredProducts = async (req, res, next) => {
   try {
-    const { minPrice, maxPrice, category_id } = req.body;
+    const { minPrice, maxPrice, category_id, product_ids } = req.body;
     const whereClause = {};
+
+    // Product ID filter
+    if (product_ids?.length) {
+      whereClause.product_id = {
+        [Op.in]: product_ids,
+      };
+    }
 
     // Price filter
     if (minPrice || maxPrice) {
@@ -48,6 +69,10 @@ export const getFilteredProducts = async (req, res, next) => {
         model: Category,
         attributes: ["name"], // Optional: only fetch the 'name' column
       },
+      {
+        model: Inventory,
+        attributes: [],
+      },
     ];
     if (category_id) {
       includeClause.push({
@@ -58,8 +83,17 @@ export const getFilteredProducts = async (req, res, next) => {
     }
 
     const products = await Product.findAll({
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+            "inventory_count",
+          ],
+        ],
+      },
       where: whereClause,
       include: includeClause,
+      group: ["Product.product_id", "Category.category_id"],
     });
 
     res.json(products);
