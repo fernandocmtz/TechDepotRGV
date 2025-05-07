@@ -10,6 +10,7 @@ import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import orderitemRoutes from './routes/orderitemRoutes.js';
 import returnRoutes from './routes/returnRoutes.js';
 import shipmentRoutes from './routes/shipmentRoutes.js';
 
@@ -30,6 +31,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/order-items', orderitemRoutes);
 app.use('/api/returns', returnRoutes);
 app.use('/api/shipments', shipmentRoutes);
 
@@ -38,7 +40,7 @@ async function startServer() {
     try {
         await sequelize.authenticate();
         console.log('✅ Database connected successfully.');
-        await sequelize.sync(); // ✅ Ensures tables are created
+        await sequelize.sync({alter: true}); // ✅ Ensures tables are created
         console.log('✅ Tables synchronized.');
 
         const PORT = process.env.PORT || 5001;
