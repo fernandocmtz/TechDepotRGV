@@ -9,7 +9,8 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/context/cart/useCart";
 import { useProducts } from "@/hooks/useProducts";
-import { CartItem, Product } from "@/services/types";
+import { CartItem, OrderData, Product } from "@/services/types";
+import { api_post_order } from "@/services/api";
 
 const Cart = () => {
   const { cartItems: cartItemsV2, updateCartItem, removeFromCart } = useCart();
@@ -31,6 +32,9 @@ const Cart = () => {
   const [paymentExpiry, setPaymentExpiry] = useState("");
   const [paymentCvv, setPaymentCvv] = useState("");
 
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
+
   const productIds = useMemo(
     () => cartItemsV2.map((item) => item.product_id),
     [cartItemsV2]
@@ -51,6 +55,9 @@ const Cart = () => {
       setPaymentCardNumber("");
       setPaymentExpiry("");
       setPaymentCvv("");
+
+      setError("");
+      setSuccess("");
     }
   }, [showCheckoutModal]);
 
@@ -114,6 +121,30 @@ const Cart = () => {
     }
 
     setShowCheckoutModal(true);
+  };
+
+  const handleOrder = async () => {
+    const shippingAddress: OrderData = {
+      address: {
+        address_line_1: addressLine1,
+        address_line_2: addressLine2,
+        city: city,
+        state: stateRegion,
+        postal_code: postalCode,
+        country: country,
+      },
+    };
+
+    try {
+      const res = await api_post_order(shippingAddress);
+      setShowCheckoutModal(false);
+      toast({
+        title: "Success",
+        description: "Successfully placed order",
+      });
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const addresses = [];
@@ -450,15 +481,25 @@ const Cart = () => {
                         ? " bg-green-500"
                         : "bg-gray-300 cursor-not-allowed"
                     }`}
-                    onClick={() => {
-                      /* handle final submit */
-                    }}
+                    onClick={handleOrder}
                     disabled={!validPayment}
                   >
                     Confirm Payment
                   </button>
                 </div>
               </>
+            )}
+
+            {error ? (
+              <div className="text-center pt-4 text-red-500 font-bold">
+                {error}
+              </div>
+            ) : success ? (
+              <div className="text-center pt-4 text-green-500 font-bold">
+                {success}
+              </div>
+            ) : (
+              <></>
             )}
           </div>
         </div>

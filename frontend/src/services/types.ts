@@ -32,3 +32,16 @@ export type CartItem = {
   quantity: number;
   product_inventory: number;
 };
+
+export type OrderData = {
+  address: OrderAddressData;
+};
+
+export type OrderAddressData = {
+  address_line_1: string;
+  address_line_2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+};
