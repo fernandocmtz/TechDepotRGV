@@ -4,7 +4,7 @@ import { DataTypes } from 'sequelize';
 // Define the Shipment model
 export const Shipment = sequelize.define('Shipment', {
     
-id:{
+shipment_id:{
     type:DataTypes.INTEGER,
     primaryKey:true,
     autoIncrement:true
