@@ -20,7 +20,13 @@ status:{
 tracking_number:{
     type:DataTypes.STRING,
     allowNull: false
+},
+delivered_at:{
+    type:DataTypes.DATE,
+    allowNull: false,
+    defaultValue:sequelize.literal('CURRENT_TIMESTAMP')
 }
+
 }, { tableName: 'shipments',
      timestamps: true, });
 
