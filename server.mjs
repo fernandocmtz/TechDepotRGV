@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
@@ -25,11 +26,18 @@ dotenv.config();
 
 // Initialize Express App
 const app = express();
-
 // Middleware
-app.use(cors());
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:8080";
+
+app.use(
+  cors({
+    origin: FRONTEND_ORIGIN, // no wildcard!
+    credentials: true, // <–– allows Set-Cookie and Cookie headers
+  })
+);
 app.use(helmet());
 app.use(express.json());
+app.use(cookieParser());
 
 // API Routes
 app.use("/api/users", userRoutes);
