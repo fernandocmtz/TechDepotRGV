@@ -30,8 +30,15 @@ export const getProductById = async (req, res, next) => {
 
 export const getFilteredProducts = async (req, res, next) => {
   try {
-    const { minPrice, maxPrice, category_id } = req.body;
+    const { minPrice, maxPrice, category_id, product_ids } = req.body;
     const whereClause = {};
+
+    // Product ID filter
+    if (product_ids?.length) {
+      whereClause.product_id = {
+        [Op.in]: product_ids,
+      };
+    }
 
     // Price filter
     if (minPrice || maxPrice) {

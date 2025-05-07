@@ -16,6 +16,7 @@ export type ProductFilters = {
   category_id?: number;
   minPrice?: number;
   maxPrice?: number;
+  product_ids?: number[];
 };
 
 export type Category = {

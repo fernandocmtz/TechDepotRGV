@@ -27,5 +27,15 @@ export function useProducts() {
     }
   }, []);
 
-  return { products, loading, error, refresh: fetchProducts };
+  const clearProducts = useCallback(() => {
+    setProducts([]);
+  }, []);
+
+  return {
+    products,
+    loading,
+    error,
+    refresh: fetchProducts,
+    clear: clearProducts,
+  };
 }
