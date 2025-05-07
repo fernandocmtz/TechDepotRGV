@@ -11,10 +11,12 @@ import { useCart } from "@/context/cart/useCart";
 import { useProducts } from "@/hooks/useProducts";
 import { CartItem, OrderData, Product } from "@/services/types";
 import { api_post_order } from "@/services/api";
+import { useAuth } from "@/context/auth/useAuth";
 
 const Cart = () => {
   const { cartItems: cartItemsV2, updateCartItem, removeFromCart } = useCart();
   const { products, refresh, loading, clear } = useProducts();
+  const { accessToken } = useAuth();
 
   const [step, setStep] = useState<"address" | "payment">("address");
 
@@ -136,7 +138,8 @@ const Cart = () => {
     };
 
     try {
-      const res = await api_post_order(shippingAddress);
+      const res = await api_post_order(shippingAddress, accessToken);
+      console.log(accessToken);
       setShowCheckoutModal(false);
       toast({
         title: "Success",

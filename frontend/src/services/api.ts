@@ -60,12 +60,13 @@ export function api_get_all_categories() {
   });
 }
 
-export function api_post_order(orderData: OrderData) {
+export function api_post_order(orderData: OrderData, accessToken: string) {
   return new Promise((resolve, reject) => {
     fetch(`${url}/api/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(orderData),
     })
