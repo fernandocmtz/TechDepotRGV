@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 // Define Return model
 export const Return = sequelize.define('Return', {
-    id:{
+    return_id:{
         type:DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
