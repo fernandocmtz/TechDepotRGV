@@ -35,6 +35,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
     });
   };
 
+  const isOutOfStock = product.inventory_count === 0;
+  const isLowStock = product.inventory_count > 0 && product.inventory_count < 5;
+
   return (
     <div
       className={cn(
@@ -55,9 +58,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
       </div>
 
       <div className="p-4 flex-grow flex flex-col">
-        <span className="text-xs font-medium text-tech-blue bg-tech-blue/10 px-2 py-1 rounded-full inline-block mb-2 w-fit">
-          {product.Category.name}
-        </span>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs font-medium text-tech-blue bg-tech-blue/10 px-2 py-1 rounded-full inline-block mb-2 w-fit">
+            {product.Category.name}
+          </span>
+
+          {isOutOfStock && (
+            <span className="bg-red-500 text-white text-xs font-medium px-2 py-1 rounded-full w-fit mb-2">
+              Out of Stock
+            </span>
+          )}
+
+          {isLowStock && !isOutOfStock && (
+            <span className="bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded-full w-fit mb-2">
+              Only {product.inventory_count} left
+            </span>
+          )}
+        </div>
 
         <Link to={`/products/${product.product_id}`}>
           <h3 className="font-medium text-lg hover:text-tech-blue transition-colors">
@@ -79,6 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
             variant="outline"
             className="hover:bg-tech-blue hover:text-white transition-colors"
             onClick={handleAddToCart}
+            disabled={isOutOfStock}
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Add

@@ -10,6 +10,7 @@ export type Product = {
   Category: {
     name: string;
   };
+  inventory_count: number;
 };
 
 export type ProductFilters = {
