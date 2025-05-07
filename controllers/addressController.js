@@ -42,6 +42,7 @@ export const utilfindOrCreateAddress = async (addressData) => {
       state: addressData.state,
       postal_code: addressData.postal_code,
       country: addressData.country,
+      user_id: addressData.user_id,
     },
     defaults: addressData,
   });

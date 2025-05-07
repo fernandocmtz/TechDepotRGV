@@ -1,6 +1,7 @@
 import { getAllUsers, getUserById } from "../models/userModel.js";
 import { v4 as uuidv4 } from "uuid";
 import { GUEST_USER } from "../utils/constants.js";
+import { User } from "../models/userModel.js";
 
 export const getUsers = async (req, res) => {
   try {

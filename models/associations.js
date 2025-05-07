@@ -3,7 +3,6 @@ import { User } from "./userModel.js";
 import { Product } from "./productModel.js";
 import { Category } from "./categoryModel.js";
 import { Inventory } from "./inventoryModel.js";
-import { User } from "./userModel.js";
 import { Address } from "./addressModel.js";
 
 export const associateModels = () => {
