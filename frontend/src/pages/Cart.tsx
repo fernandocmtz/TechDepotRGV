@@ -43,10 +43,14 @@ const Cart = () => {
   };
   const mergedProducts = mergeProductsAndCart(products, cartItemsV2);
 
-  const updateQuantity = (productId: number, newQuantity: number) => {
+  const updateQuantity = (
+    productId: number,
+    newQuantity: number,
+    productInventory: number
+  ) => {
     if (newQuantity < 1) return;
 
-    updateCartItem(productId, newQuantity);
+    updateCartItem(productId, newQuantity, productInventory);
   };
 
   const removeItem = (productId: number) => {
@@ -140,7 +144,8 @@ const Cart = () => {
                               onClick={() =>
                                 updateQuantity(
                                   item.product_id,
-                                  item.quantity - 1
+                                  item.quantity - 1,
+                                  item.inventory_count
                                 )
                               }
                               disabled={item.quantity <= 1}
@@ -157,9 +162,11 @@ const Cart = () => {
                               onClick={() =>
                                 updateQuantity(
                                   item.product_id,
-                                  item.quantity + 1
+                                  item.quantity + 1,
+                                  item.inventory_count
                                 )
                               }
+                              disabled={item.quantity >= item.inventory_count}
                             >
                               <Plus className="h-3 w-3" />
                             </Button>

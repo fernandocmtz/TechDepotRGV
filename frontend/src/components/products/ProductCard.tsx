@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className }) => {
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
-    addToCart(product.product_id, 1);
+    addToCart(product.product_id, 1, product.inventory_count);
 
     toast({
       title: "Success",

@@ -46,7 +46,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    addToCart(product.product_id, quantity);
+    addToCart(product.product_id, quantity, product.inventory_count);
 
     toast({
       title: "Success",
@@ -186,7 +186,9 @@ const ProductDetail = () => {
                       size="icon"
                       className="h-10 w-10 rounded-none"
                       onClick={() => handleQuantityChange(1)}
-                      disabled={quantity >= 10}
+                      disabled={
+                        quantity >= 10 || quantity >= product.inventory_count
+                      }
                     >
                       <Plus className="h-4 w-4" />
                     </Button>

@@ -18,17 +18,25 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (productId: number, quantity: number) => {
+  const addToCart = (
+    productId: number,
+    quantity: number,
+    product_inventory: number
+  ) => {
     dispatch({
       type: "ADD_ITEM",
-      payload: { product_id: productId, quantity },
+      payload: { product_id: productId, quantity, product_inventory },
     });
   };
 
-  const updateCartItem = (productId: number, quantity: number) => {
+  const updateCartItem = (
+    productId: number,
+    quantity: number,
+    product_inventory: number
+  ) => {
     dispatch({
       type: "UPDATE_ITEM",
-      payload: { product_id: productId, quantity },
+      payload: { product_id: productId, quantity, product_inventory },
     });
   };
 
