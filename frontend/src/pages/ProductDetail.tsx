@@ -100,6 +100,9 @@ const ProductDetail = () => {
     );
   }
 
+  const isOutOfStock = product.inventory_count === 0;
+  const isLowStock = product.inventory_count > 0 && product.inventory_count < 5;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 md:px-6 py-12">
@@ -139,9 +142,19 @@ const ProductDetail = () => {
               <span className="text-3xl font-bold text-tech-dark">
                 ${product.price}
               </span>
-              <span className="ml-2 text-sm text-muted-foreground">
-                In stock
-              </span>
+              {!isOutOfStock && !isLowStock && (
+                <span className="ml-2 text-sm text-muted-foreground">
+                  In stock
+                </span>
+              )}
+              {isLowStock && (
+                <span className="ml-2 text-sm text-yellow-500">
+                  Only {product.inventory_count} left
+                </span>
+              )}
+              {isOutOfStock && (
+                <span className="ml-2 text-sm text-red-500">Out of stock</span>
+              )}
             </div>
 
             <p className="text-muted-foreground mb-8 leading-relaxed">
@@ -152,38 +165,41 @@ const ProductDetail = () => {
 
             <div className="space-y-6">
               {/* Quantity selector */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Quantity
-                </label>
-                <div className="flex items-center w-fit border border-input rounded-md">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-none"
-                    onClick={() => handleQuantityChange(-1)}
-                    disabled={quantity <= 1}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-12 text-center">{quantity}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-10 w-10 rounded-none"
-                    onClick={() => handleQuantityChange(1)}
-                    disabled={quantity >= 10}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
+              {!isOutOfStock && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Quantity
+                  </label>
+                  <div className="flex items-center w-fit border border-input rounded-md">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-none"
+                      onClick={() => handleQuantityChange(-1)}
+                      disabled={quantity <= 1}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-12 text-center">{quantity}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-10 w-10 rounded-none"
+                      onClick={() => handleQuantityChange(1)}
+                      disabled={quantity >= 10}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Add to cart button */}
               <Button
                 size="lg"
                 className="w-full bg-tech-blue hover:bg-tech-blue/90 text-white"
                 onClick={handleAddToCart}
+                disabled={isOutOfStock}
               >
                 <>
                   <ShoppingCart className="mr-2 h-4 w-4" />

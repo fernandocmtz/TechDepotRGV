@@ -69,6 +69,10 @@ export const getFilteredProducts = async (req, res, next) => {
         model: Category,
         attributes: ["name"], // Optional: only fetch the 'name' column
       },
+      {
+        model: Inventory,
+        attributes: [],
+      },
     ];
     if (category_id) {
       includeClause.push({
@@ -79,8 +83,17 @@ export const getFilteredProducts = async (req, res, next) => {
     }
 
     const products = await Product.findAll({
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+            "inventory_count",
+          ],
+        ],
+      },
       where: whereClause,
       include: includeClause,
+      group: ["Product.product_id", "Category.category_id"],
     });
 
     res.json(products);
