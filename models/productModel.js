@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 // Define Product model
 export const Product = sequelize.define('Product', {
-  id: {
+  product_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true

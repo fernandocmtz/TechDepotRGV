@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 
 // Define Payment model
 export const Payment = sequelize.define('Payment', {
-    id:{
+    payment_id:{
         type:DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
