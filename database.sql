@@ -5,6 +5,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     phone_number VARCHAR(15),
+    role VARCHAR(100) NOT NULL DEFAULT 'user',
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
