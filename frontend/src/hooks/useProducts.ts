@@ -27,9 +27,5 @@ export function useProducts() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
   return { products, loading, error, refresh: fetchProducts };
 }

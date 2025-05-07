@@ -5,10 +5,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
+import { useEffect } from "react";
 
 const Index = () => {
-  const { products: productsV2, loading: productsLoading } = useProducts();
+  const {
+    products: productsV2,
+    loading: productsLoading,
+    refresh,
+  } = useProducts();
   const { categories, loading: categoriesLoading } = useCategories();
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   // Can move this to backend
   const featuredProducts = [...productsV2]
