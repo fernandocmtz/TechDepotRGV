@@ -135,11 +135,20 @@ const Cart = () => {
         postal_code: postalCode,
         country: country,
       },
+      products: cartItemsV2.map(({ product_id, quantity }) => ({
+        product_id,
+        quantity,
+      })),
+      paymentDetails: {
+        card_name: paymentName,
+        card_number: paymentCardNumber,
+        card_cvv: paymentCvv,
+        card_expiry: paymentExpiry,
+      },
     };
 
     try {
       const res = await api_post_order(shippingAddress, accessToken);
-      console.log(accessToken);
       setShowCheckoutModal(false);
       toast({
         title: "Success",

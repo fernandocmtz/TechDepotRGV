@@ -35,6 +35,8 @@ export type CartItem = {
 
 export type OrderData = {
   address: OrderAddressData;
+  products: OrderProductsData[];
+  paymentDetails: OrderPaymentData;
 };
 
 export type OrderAddressData = {
@@ -44,4 +46,16 @@ export type OrderAddressData = {
   state: string;
   postal_code: string;
   country: string;
+};
+
+export type OrderProductsData = {
+  product_id: number;
+  quantity: number;
+};
+
+export type OrderPaymentData = {
+  card_name: string;
+  card_number: string;
+  card_expiry: string;
+  card_cvv: string;
 };
