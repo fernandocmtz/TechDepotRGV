@@ -31,7 +31,7 @@ const Cart = () => {
   const [addressLine2, setAddressLine2] = useState("");
   const [city, setCity] = useState("");
   const [stateRegion, setStateRegion] = useState("");
-  const [postalCode, setPostalCode] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [country, setCountry] = useState("United States");
 
   const [paymentName, setPaymentName] = useState("");
@@ -55,7 +55,7 @@ const Cart = () => {
       setAddressLine2("");
       setCity("");
       setStateRegion("");
-      setPostalCode("");
+      setZipCode("");
       setCountry("United States");
 
       setPaymentName("");
@@ -137,7 +137,7 @@ const Cart = () => {
         address_line_2: addressLine2,
         city: city,
         state: stateRegion,
-        postal_code: postalCode,
+        zip_code: zipCode,
         country: country,
       },
       products: cartItemsV2.map(({ product_id, quantity }) => ({
@@ -172,8 +172,8 @@ const Cart = () => {
     (addressLine1.trim() &&
       city.trim() &&
       stateRegion.trim() &&
-      postalCode.trim() &&
-      postalCode.length == 5);
+      zipCode.trim() &&
+      zipCode.length == 5);
 
   const validPayment =
     paymentName.trim() &&
@@ -416,9 +416,9 @@ const Cart = () => {
                     />
                     <input
                       className="w-full border p-2"
-                      placeholder="Postal Code*"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
+                      placeholder="Zip Code*"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value)}
                     />
                     <input
                       className="w-full border p-2"

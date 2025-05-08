@@ -44,7 +44,7 @@ export type OrderAddressData = {
   address_line_2?: string;
   city: string;
   state: string;
-  postal_code: string;
+  zip_code: string;
   country: string;
 };
 
