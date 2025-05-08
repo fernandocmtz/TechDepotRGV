@@ -2,6 +2,7 @@ import { sequelize } from "../config/db.js";
 import { DataTypes } from "sequelize";
 import { utilfindOrCreateAddress } from "../controllers/addressController.js";
 import { utilFindOrCreateUserByUserId } from "../controllers/userController.js";
+import { ORDER_STATUS } from "../utils/constants.js";
 
 // Define Order model
 export const Order = sequelize.define(
@@ -30,7 +31,12 @@ export const Order = sequelize.define(
       //}
     },
     status: {
-      type: DataTypes.ENUM("pending", "shipped", "delivered", "cancelled"),
+      type: DataTypes.ENUM(
+        ORDER_STATUS.CANCELLED,
+        ORDER_STATUS.PENDING,
+        ORDER_STATUS.PROCESSED,
+        ORDER_STATUS.SHIPPED
+      ),
       allowNull: false,
     },
   },

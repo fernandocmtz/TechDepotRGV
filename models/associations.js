@@ -4,6 +4,8 @@ import { Product } from "./productModel.js";
 import { Category } from "./categoryModel.js";
 import { Inventory } from "./inventoryModel.js";
 import { Address } from "./addressModel.js";
+import { Order } from "./orderModel.js";
+import { Payment } from "./paymentModel.js";
 
 export const associateModels = () => {
   RefreshToken.belongsTo(User, { foreignKey: "user_id", onDelete: "CASCADE" });
@@ -35,5 +37,22 @@ export const associateModels = () => {
 
   User.hasMany(Address, {
     foreignKey: "user_id",
+  });
+
+  Order.hasOne(Payment, {
+    foreignKey: {
+      name: "order_id",
+      allowNull: false,
+      unique: true, // ensures 1-to-1
+    },
+    onDelete: "CASCADE",
+  });
+
+  Payment.belongsTo(Order, {
+    foreignKey: {
+      name: "order_id",
+      allowNull: false,
+      unique: true,
+    },
   });
 };
