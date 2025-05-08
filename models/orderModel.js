@@ -54,3 +54,11 @@ export const createOrder = async (userId, address, status) => {
 
   return order.order_id;
 };
+
+export const updateOrder = async (condition, value) => {
+  const updatedOrder = await Order.update(value, {
+    where: condition,
+  });
+
+  return updatedOrder;
+};

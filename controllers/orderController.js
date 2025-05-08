@@ -1,4 +1,4 @@
-import { createOrder } from "../models/orderModel.js";
+import { createOrder, updateOrder } from "../models/orderModel.js";
 import {
   ORDER_STATUS,
   PAYMENT_METHOD,
@@ -40,10 +40,13 @@ export const placeOrder = async (req, res) => {
     );
 
     if (payment.status === PAYMENT_STATUS.DECLINED) {
+      updateOrder({ order_id: orderId }, { status: ORDER_STATUS.CANCELLED });
       res.status(402).json({ error: "Error: Payment declined" });
       return;
     }
 
+    // Update order status to processed
+    updateOrder({ order_id: orderId }, { status: ORDER_STATUS.PROCESSED });
     res.json({ message: "Order placed successfully", orderId });
   } catch (error) {
     res.status(500).json({ error: error.message });
