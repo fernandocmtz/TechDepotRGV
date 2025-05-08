@@ -21,6 +21,21 @@ export const placeOrder = async (req, res) => {
       product_ids: Object.keys(productsByProductId),
     });
 
+    const isAProductOverOrdered = orderedProducts.some((orderedProduct) => {
+      return (
+        orderedProduct.get("inventory_count") <
+        productsByProductId[orderedProduct.product_id].quantity
+      );
+    });
+
+    if (isAProductOverOrdered) {
+      updateOrder({ order_id: orderId }, { status: ORDER_STATUS.CANCELLED });
+      res.status(400).json({
+        error: "Error: Order cancelled - Not enough stock to fulfill order",
+      });
+      return;
+    }
+
     const subtotal = orderedProducts.reduce(
       (sum, product) =>
         sum +
@@ -41,7 +56,9 @@ export const placeOrder = async (req, res) => {
 
     if (payment.status === PAYMENT_STATUS.DECLINED) {
       updateOrder({ order_id: orderId }, { status: ORDER_STATUS.CANCELLED });
-      res.status(402).json({ error: "Error: Payment declined" });
+      res
+        .status(402)
+        .json({ error: "Error: Order cancelled - Payment declined" });
       return;
     }
 
