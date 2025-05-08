@@ -1,9 +1,9 @@
 import express from "express";
 import {
   getUserAddresses,
-  addAddress,
   updateAddress,
   deleteAddress,
+  createAddress,
 } from "../controllers/addressController.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
 
@@ -13,7 +13,7 @@ const router = express.Router();
 router.get("/", verifyToken, getUserAddresses);
 
 // POST a new address
-router.post("/", verifyToken, addAddress);
+router.post("/", verifyToken, createAddress);
 
 // PUT update an existing address
 router.put("/:id", verifyToken, updateAddress);
