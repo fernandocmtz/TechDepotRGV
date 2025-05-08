@@ -15,6 +15,7 @@ import { utilsSimulateCreatePayment } from "./paymentController.js";
 import { addShipment } from "../models/shipmentModel.js";
 import { Inventory } from "../models/inventoryModel.js";
 import { OrderItem } from "../models/orderitemModel.js";
+import bcrypt from "bcrypt";
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -25,6 +26,8 @@ export const createOrder = async (req, res, next) => {
     // Get user ID if logged in, a guest user is created if not logged in
     const userId = req.user?.id ?? null;
 
+    const hashedPassword = await bcrypt.hash(GUEST_USER.PASSWORD, 10);
+
     const [verifiedUser] = await User.findOrCreate({
       where: { user_id: userId },
       defaults: {
@@ -33,7 +36,7 @@ export const createOrder = async (req, res, next) => {
         last_name: GUEST_USER.LAST_NAME,
         email: GUEST_USER.EMAIL,
         phone_number: GUEST_USER.PHONE_NUMBER,
-        password: GUEST_USER.PASSWORD,
+        password: hashedPassword,
       },
     });
 
