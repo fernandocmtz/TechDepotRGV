@@ -125,3 +125,11 @@ export type PostReturn = {
   order_item_id: number;
   reason: string;
 };
+
+export type PostProduct = {
+  name: string;
+  description: string;
+  price: string;
+  category_id: number;
+  image_url: string;
+};

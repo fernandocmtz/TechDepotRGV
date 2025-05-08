@@ -8,6 +8,7 @@ import {
   PostPutAddress,
   FetchOrderItems,
   PostReturn,
+  PostProduct,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -250,6 +251,32 @@ export function api_post_return(accessToken: string, returnData: PostReturn) {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(returnData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_product(
+  accessToken: string,
+  productData: PostProduct
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(productData),
     })
       .then((res) => {
         if (res.ok) {

@@ -7,9 +7,7 @@ import {
   deleteProduct,
   getProductById,
 } from "../controllers/productController.js";
-
-import validateProduct from "../middleware/productValidator.js";
-import validateRequest from "../middleware/validateRequest.js";
+import { verifyAdminToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -18,8 +16,8 @@ router.get("/:id", getProductById);
 
 router.post("/filter", getFilteredProducts);
 
-router.post("/", validateProduct, validateRequest, createProduct);
-router.put("/:id", validateProduct, validateRequest, updateProduct);
-router.delete("/:id", deleteProduct);
+router.post("/", verifyAdminToken, createProduct);
+router.put("/:id", verifyAdminToken, updateProduct);
+router.delete("/:id", verifyAdminToken, deleteProduct);
 
 export default router;

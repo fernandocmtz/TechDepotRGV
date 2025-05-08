@@ -1,198 +1,212 @@
-
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { addProduct, getCategories } from '@/services/productService';
+import React, { useEffect, useState } from "react";
+import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  getCategories,
+  getProducts,
+  addProduct,
+} from "@/services/productService";
+import { useCategories } from "@/hooks/useCategories";
 import { toast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useProducts } from "@/hooks/useProducts";
+import { api_post_product } from "@/services/api";
+import { useAuth } from "@/context/auth/useAuth";
 
 const Admin = () => {
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    image: '',
-    category: ''
+    name: "",
+    description: "",
+    price: "",
+    image_url: "",
+    category_id: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const categories = getCategories();
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const { accessToken } = useAuth();
+
+  const { categories } = useCategories();
+  const { products, refresh } = useProducts();
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
-  const handleCategoryChange = (value: string) => {
-    setFormData(prev => ({ ...prev, category: value }));
+
+  const handleCategoryChange = (value) => {
+    setFormData((prev) => ({ ...prev, category_id: value }));
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleProductDelete = (productId) => {};
+
+  const openModal = (product = null) => {
+    setEditingProduct(product);
+    if (product) {
+      setFormData({
+        ...product,
+        price: String(product.price),
+        category_id: String(product.category_id),
+      });
+    } else {
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        image_url: "",
+        category_id: "",
+      });
+    }
+    setOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Validate form
-    if (!formData.name || !formData.description || !formData.price || !formData.image || !formData.category) {
+
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.price ||
+      !formData.image_url ||
+      !formData.category_id
+    ) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Please fill in all fields"
+        description: "Please fill in all fields",
       });
-      setIsLoading(false);
       return;
     }
-    
+
     try {
-      // Convert price to number
       const productData = {
         ...formData,
-        price: parseFloat(formData.price)
+        category_id: Number(formData.category_id),
       };
-      
-      // In a real app, this would be an API call
-      setTimeout(() => {
-        addProduct(productData);
-        toast({
-          title: "Success",
-          description: "Product added successfully"
-        });
-        setFormData({
-          name: '',
-          description: '',
-          price: '',
-          image: '',
-          category: ''
-        });
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
+
+      await api_post_product(accessToken, productData);
+      toast({ title: "Success", description: "Product saved" });
+      setOpen(false);
+      // fetchProducts();
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error adding product"
+        description: "Failed to save product",
       });
-      setIsLoading(false);
     }
   };
-  
+
   return (
     <Layout>
-      <div className="container mx-auto px-4 md:px-6 py-12">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">
-              Add new products to your store
-            </p>
-          </div>
-          
-          <div className="bg-white rounded-xl shadow-sm border border-border/40 p-6">
-            <h2 className="text-xl font-semibold mb-6">Add New Product</h2>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name</Label>
+      <div className="w-full flex flex-col items-center space-y-2 mb-4">
+        <h1 className="text-xl font-semibold">Product Management</h1>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => openModal()}>Add Product</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <Label>Name</Label>
                 <Input
-                  id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter product name"
-                  required
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+              <div>
+                <Label>Description</Label>
                 <Textarea
-                  id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Enter product description"
-                  rows={4}
-                  required
                 />
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price ($)</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={handleCategoryChange}
-                    required
-                  >
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
+              <div>
+                <Label>Price</Label>
                 <Input
-                  id="image"
-                  name="image"
-                  value={formData.image}
+                  type="number"
+                  name="price"
+                  value={formData.price}
                   onChange={handleChange}
-                  placeholder="Enter image URL"
-                  required
                 />
-                <p className="text-xs text-muted-foreground">
-                  Enter a valid URL for the product image. For testing, you can use Unsplash images.
+              </div>
+              <div>
+                <Label>Image URL</Label>
+                <Input
+                  name="image_url"
+                  value={formData.image_url}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <Select
+                  value={formData.category_id}
+                  onValueChange={handleCategoryChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem
+                        key={cat.category_id}
+                        value={String(cat.category_id)}
+                      >
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button type="submit">Save Product</Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="w-full flex justify-center">
+        <div className="max-w-2xl max-h-[500px] overflow-y-auto space-y-4 w-full">
+          {products.map((product) => (
+            <div
+              key={product.product_id}
+              className="border p-4 rounded flex justify-between items-center"
+            >
+              <div>
+                <h3 className="font-semibold">{product.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  ${product.price}
                 </p>
               </div>
-              
-              {formData.image && (
-                <div className="rounded-md overflow-hidden border border-border h-40 bg-muted">
-                  <img
-                    src={formData.image}
-                    alt="Product preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://via.placeholder.com/300x200?text=Invalid+Image+URL";
-                    }}
-                  />
-                </div>
-              )}
-              
-              <div className="flex justify-end">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Adding...' : 'Add Product'}
+              <div className="flex gap-2">
+                <Button variant="secondary" onClick={() => openModal(product)}>
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => handleProductDelete(product.product_id)}
+                >
+                  Delete
                 </Button>
               </div>
-            </form>
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </Layout>
