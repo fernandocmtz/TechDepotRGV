@@ -13,6 +13,8 @@ import { v4 as uuidv4 } from "uuid";
 import { utilsGetFilteredProducts } from "./productController.js";
 import { utilsSimulateCreatePayment } from "./paymentController.js";
 import { addShipment } from "../models/shipmentModel.js";
+import { Inventory } from "../models/inventoryModel.js";
+import { OrderItem } from "../models/orderitemModel.js";
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -138,6 +140,28 @@ export const createOrder = async (req, res, next) => {
       trackingNumber,
       SHIPMENT_STATUS.PREPARING
     );
+
+    // Remove ordered items from inventory
+    // Create ordered items for the ordered products
+    for (const { product_id, price } of orderedProducts) {
+      const num_picked = productsByProductId[product_id].quantity;
+
+      for (let i = 0; i < num_picked; i++) {
+        const selectedInventory = await Inventory.findOne({
+          where: { product_id },
+        });
+
+        if (selectedInventory) {
+          await selectedInventory.destroy(); // ← await this too
+        }
+
+        OrderItem.create({
+          order_id: order.order_id,
+          product_id,
+          item_sale_price: price,
+        });
+      }
+    }
 
     res.status(201).json({ newOrder });
   } catch (err) {
