@@ -11,6 +11,7 @@ const url = import.meta.env.VITE_API_URL;
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [accessToken, setAccessToken] = useState<string>("");
+  const [role, setRole] = useState<string>("guest");
   const [loading, setLoading] = useState<boolean>(true);
 
   // Silent refresh on mount
@@ -24,6 +25,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const data = await res.json();
         if (data.accessToken) {
           setAccessToken(data.accessToken);
+        }
+
+        if (data.role) {
+          setRole(data.role);
         }
       } catch {
         // ignore
@@ -57,6 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const data = await res.json();
     if (!res.ok) return { ok: false, message: data.message ?? "" };
     setAccessToken(data.accessToken || "");
+    setRole(data.role || "guest");
     return { ok: true, message: data.message ?? "" };
   };
 
@@ -66,6 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       credentials: "include",
     });
     setAccessToken("");
+    setRole("guest");
   };
 
   const fetchAuth = async (
@@ -102,6 +109,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       const data = await ref.json();
       setAccessToken(data.accessToken || "");
+      setRole(data.role || "guest");
+
       res = await makeCall();
     }
     return res;
@@ -111,7 +120,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated: !!accessToken,
+        isAdmin: !!accessToken && role === "admin",
         accessToken,
+        role,
         loading,
         login,
         logout,
