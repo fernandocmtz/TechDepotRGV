@@ -342,25 +342,52 @@ export function api_delete_product(
   });
 }
 
-export function api_get_all_users(
-  accessToken: string
-) {
-    return new Promise<FetchedUser[]>((resolve, reject) => {
-      fetch(`${url}/api/users/`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+export function api_get_all_users(accessToken: string) {
+  return new Promise<FetchedUser[]>((resolve, reject) => {
+    fetch(`${url}/api/users/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
       })
-        .then((res) => {
-          if (res.ok) {
-            resolve(res.json());
-          } else {
-            throw res;
-          }
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_patch_user_role(
+  accessToken: string,
+  userId: number,
+  role: string
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/users/role/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        role,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }

@@ -3,6 +3,7 @@ import {
   getActiveUser,
   getUsers,
   patchActiveUser,
+  patchUserRole,
 } from "../controllers/userController.js";
 import { verifyAdminToken, verifyToken } from "../middleware/authMiddleware.js";
 
@@ -13,5 +14,7 @@ router.get("/", verifyAdminToken, getUsers);
 router.get("/active", verifyToken, getActiveUser);
 
 router.patch("/active", verifyToken, patchActiveUser);
+
+router.patch("/role/:id", verifyAdminToken, patchUserRole);
 
 export default router;

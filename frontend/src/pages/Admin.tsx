@@ -20,6 +20,7 @@ import {
   api_put_product,
   api_delete_product,
   api_get_all_users,
+  api_patch_user_role,
 } from "@/services/api";
 import axios from "axios";
 import { useAuth } from "@/context/auth/useAuth";
@@ -64,20 +65,17 @@ const Admin = () => {
     }
   }, [activeTab, fetchUsers, fetchProducts]);
 
-  const toggleAdmin = async (userId, isAdmin) => {
+  const toggleAdmin = async (userId, role) => {
     try {
-      await axios.patch(
-        `/api/admin/users/${userId}`,
-        { role: isAdmin ? "user" : "admin" },
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
+      const res = await api_patch_user_role(accessToken, userId, role);
       toast({ title: "Updated", description: "User role changed" });
       fetchUsers();
-    } catch {
+    } catch (err) {
+      const { error: errMessage } = await err.json();
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update role",
+        description: `Failed to update role. ${errMessage}`,
       });
     }
   };
@@ -299,7 +297,10 @@ const Admin = () => {
                     <Button
                       variant="secondary"
                       onClick={() =>
-                        toggleAdmin(user.user_id, user.role === "admin")
+                        toggleAdmin(
+                          user.user_id,
+                          user.role === "admin" ? "user" : "admin"
+                        )
                       }
                     >
                       {user.role === "admin" ? "Remove Admin" : "Make Admin"}
