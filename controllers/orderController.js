@@ -1,71 +1,68 @@
-import { createOrder, updateOrder } from "../models/orderModel.js";
-import {
-  ORDER_STATUS,
-  PAYMENT_METHOD,
-  PAYMENT_STATUS,
-} from "../utils/constants.js";
-import { utilsSimulateCreatePayment } from "./paymentController.js";
-import { utilsGetFilteredProducts } from "./productController.js";
+import { Order } from '../models/orderModel.js';
 
-export const placeOrder = async (req, res) => {
+export const createOrder = async (req, res, next) => {
   try {
-    const { address, products, paymentDetails } = req.body;
-    const status = ORDER_STATUS.PENDING;
-    const orderId = await createOrder(req.user?.id ?? null, address, status);
 
-    const productsByProductId = products.reduce((acc, item) => {
-      acc[item.product_id] = item;
-      return acc;
-    }, {});
-    const orderedProducts = await utilsGetFilteredProducts({
-      product_ids: Object.keys(productsByProductId),
+    const verifiedUser = await utilFindOrCreateUserByUserId(userId);
+    // Find associated user and address, if not found, create them
+    const verifiedAddress = await utilfindOrCreateAddress({
+      ...address,
+      user_id: verifiedUser.user_id,
+    });
+  
+    const order = await Order.create({
+      user_id: verifiedUser.user_id,
+      address_id: verifiedAddress.id,
+      status,
     });
 
-    const isAProductOverOrdered = orderedProducts.some((orderedProduct) => {
-      return (
-        orderedProduct.get("inventory_count") <
-        productsByProductId[orderedProduct.product_id].quantity
-      );
-    });
 
-    if (isAProductOverOrdered) {
-      updateOrder({ order_id: orderId }, { status: ORDER_STATUS.CANCELLED });
-      res.status(400).json({
-        error: "Error: Order cancelled - Not enough stock to fulfill order",
-      });
-      return;
-    }
+    const newOrder = await Order.create(req.body);
+    res.status(201).json(newOrder);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    const subtotal = orderedProducts.reduce(
-      (sum, product) =>
-        sum +
-        Number(product.price) *
-          (productsByProductId[product.product_id].quantity ?? 0),
-      0
-    );
+export const getAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.findAll();
+    res.json(orders);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    const finalAmount = subtotal * 1.07 + 10;
+export const getOrderById = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    // Payment
-    const payment = await utilsSimulateCreatePayment(
-      orderId,
-      finalAmount,
-      PAYMENT_METHOD.CREDIT_CARD,
-      paymentDetails
-    );
+export const updateOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
-    if (payment.status === PAYMENT_STATUS.DECLINED) {
-      updateOrder({ order_id: orderId }, { status: ORDER_STATUS.CANCELLED });
-      res
-        .status(402)
-        .json({ error: "Error: Order cancelled - Payment declined" });
-      return;
-    }
+    await order.update(req.body);
+    res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
 
-    // Update order status to processed
-    updateOrder({ order_id: orderId }, { status: ORDER_STATUS.PROCESSED });
-    res.json({ message: "Order placed successfully", orderId });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+export const deleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    await order.destroy();
+    res.json({ message: 'Order deleted' });
+  } catch (err) {
+    next(err);
   }
 };

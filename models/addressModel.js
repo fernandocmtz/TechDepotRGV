@@ -1,45 +1,50 @@
 import { sequelize } from "../config/db.js";
 import { DataTypes } from "sequelize";
-import { User } from "./userModel.js";
 
 export const Address = sequelize.define(
   "Address",
   {
-    address_line_1: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    address_line_2: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    state: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    postal_code: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    country: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    address_id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User,
+        model: "users",
         key: "user_id",
       },
+    },
+    address_line_1: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    address_line_2: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    state: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
+    zip_code: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+    },
+    country: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
     },
   },
   {
     tableName: "addresses",
-    timestamps: true, // automatically adds createdAt and updatedAt
+    timestamps: true,
+    underscored: true,
   }
 );
