@@ -1,14 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import {
-  getCategories,
-  getProducts,
-  addProduct,
-} from "@/services/productService";
-import { useCategories } from "@/hooks/useCategories";
-import { toast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,15 +12,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCategories } from "@/hooks/useCategories";
 import { useProducts } from "@/hooks/useProducts";
+import { toast } from "@/hooks/use-toast";
 import {
-  api_delete_product,
   api_post_product,
   api_put_product,
+  api_delete_product,
+  api_get_all_users,
 } from "@/services/api";
+import axios from "axios";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Admin = () => {
+  const [activeTab, setActiveTab] = useState<"products" | "users">("products");
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
@@ -39,13 +37,50 @@ const Admin = () => {
   });
 
   const { accessToken } = useAuth();
-
   const { categories } = useCategories();
   const { products, refresh: fetchProducts } = useProducts();
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const users = await api_get_all_users(accessToken);
+      setUsers(users);
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load users",
+      });
+    }
+  }, [accessToken]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    if (activeTab === "products") {
+      fetchProducts();
+    }
+
+    if (activeTab === "users") {
+      fetchUsers();
+    }
+  }, [activeTab, fetchUsers, fetchProducts]);
+
+  const toggleAdmin = async (userId, isAdmin) => {
+    try {
+      await axios.patch(
+        `/api/admin/users/${userId}`,
+        { role: isAdmin ? "user" : "admin" },
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      toast({ title: "Updated", description: "User role changed" });
+      fetchUsers();
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update role",
+      });
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,7 +118,6 @@ const Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (
       !formData.name ||
       !formData.description ||
@@ -100,20 +134,17 @@ const Admin = () => {
     }
 
     try {
-      const productData = {
+      const payload = {
         ...formData,
         category_id: Number(formData.category_id),
       };
 
       if (editingProduct) {
-        await api_put_product(
-          accessToken,
-          editingProduct.product_id,
-          productData
-        );
+        await api_put_product(accessToken, editingProduct.product_id, payload);
       } else {
-        await api_post_product(accessToken, productData);
+        await api_post_product(accessToken, payload);
       }
+
       toast({ title: "Success", description: "Product saved" });
       setOpen(false);
       fetchProducts();
@@ -128,102 +159,158 @@ const Admin = () => {
 
   return (
     <Layout>
-      <div className="w-full flex flex-col items-center space-y-2 mb-4">
-        <h1 className="text-xl font-semibold">Product Management</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => openModal()}>Add Product</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <Label>Name</Label>
-                <Input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Description</Label>
-                <Textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Price</Label>
-                <Input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Image URL</Label>
-                <Input
-                  name="image_url"
-                  value={formData.image_url}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <Label>Category</Label>
-                <Select
-                  value={formData.category_id}
-                  onValueChange={handleCategoryChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem
-                        key={cat.category_id}
-                        value={String(cat.category_id)}
-                      >
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit">Save Product</Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+      {/* Tab Switcher */}
+      <div className="flex gap-4 mb-4">
+        <Button
+          variant={activeTab === "products" ? "default" : "outline"}
+          onClick={() => setActiveTab("products")}
+        >
+          Products
+        </Button>
+        <Button
+          variant={activeTab === "users" ? "default" : "outline"}
+          onClick={() => setActiveTab("users")}
+        >
+          Users
+        </Button>
       </div>
 
-      <div className="w-full flex justify-center">
-        <div className="max-w-2xl max-h-[500px] overflow-y-auto space-y-4 w-full">
-          {products.map((product) => (
-            <div
-              key={product.product_id}
-              className="border p-4 rounded flex justify-between items-center"
-            >
-              <div>
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  ${product.price}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="secondary" onClick={() => openModal(product)}>
-                  Edit
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleProductDelete(product.product_id)}
+      {/* Product Management Tab */}
+      {activeTab === "products" && (
+        <>
+          <div className="flex flex-col items-center space-y-2 mb-4">
+            <h1 className="text-xl font-semibold">Product Management</h1>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={() => openModal()}>Add Product</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <form className="space-y-4" onSubmit={handleSubmit}>
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label>Description</Label>
+                    <Textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label>Price</Label>
+                    <Input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label>Image URL</Label>
+                    <Input
+                      name="image_url"
+                      value={formData.image_url}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div>
+                    <Label>Category</Label>
+                    <Select
+                      value={formData.category_id}
+                      onValueChange={handleCategoryChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem
+                            key={cat.category_id}
+                            value={String(cat.category_id)}
+                          >
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button type="submit">Save Product</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="w-full flex justify-center">
+            <div className="max-w-2xl max-h-[500px] overflow-y-auto space-y-4 w-full">
+              {products.map((product) => (
+                <div
+                  key={product.product_id}
+                  className="border p-4 rounded flex justify-between items-center"
                 >
-                  Delete
-                </Button>
-              </div>
+                  <div>
+                    <h3 className="font-semibold">{product.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      ${product.price}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      onClick={() => openModal(product)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleProductDelete(product.product_id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+        </>
+      )}
+
+      {/* User Management Tab */}
+      {activeTab === "users" && (
+        <div className="flex flex-col items-center space-y-2 mb-4 wid">
+          <h2 className="text-xl font-semibold">User Management</h2>
+          <div className="w-full flex justify-center">
+            <div className="max-w-2xl max-h-[500px] overflow-y-auto space-y-4 w-full">
+              {users.map((user) => (
+                <div
+                  key={user.user_id}
+                  className="border p-4 rounded flex justify-between items-center"
+                >
+                  <div>
+                    <h3 className="font-semibold">{user.username}</h3>
+                    <p className="text-sm text-muted-foreground">{user.role}</p>
+                  </div>
+                  {user.role !== "guest" && (
+                    <Button
+                      variant="secondary"
+                      onClick={() =>
+                        toggleAdmin(user.user_id, user.role === "admin")
+                      }
+                    >
+                      {user.role === "admin" ? "Remove Admin" : "Make Admin"}
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 };

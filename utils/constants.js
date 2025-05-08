@@ -11,6 +11,7 @@ export const GUEST_USER = {
   EMAIL: "guest@guest.com",
   PHONE_NUMBER: "0000000000",
   PASSWORD: "guestpassword",
+  ROLE: "guest",
 };
 
 export const PAYMENT_STATUS = {

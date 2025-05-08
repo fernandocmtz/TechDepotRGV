@@ -4,11 +4,11 @@ import {
   getUsers,
   patchActiveUser,
 } from "../controllers/userController.js";
-import { verifyToken } from "../middleware/authMiddleware.js";
+import { verifyAdminToken, verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getUsers);
+router.get("/", verifyAdminToken, getUsers);
 
 router.get("/active", verifyToken, getActiveUser);
 

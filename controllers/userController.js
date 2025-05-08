@@ -12,6 +12,15 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const getNonGuestUsers = async (req, res) => {
+  try {
+    const users = await getAllUsers();
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const getActiveUser = async (req, res) => {
   try {
     const userId = req.user?.id ?? null;
@@ -55,6 +64,7 @@ export const utilFindOrCreateUserByUserId = async (user_id) => {
       email: GUEST_USER.EMAIL,
       phone_number: GUEST_USER.PHONE_NUMBER,
       password: GUEST_USER.PASSWORD,
+      role: GUEST_USER.ROLE,
     },
   });
 

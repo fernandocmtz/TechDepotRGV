@@ -341,3 +341,26 @@ export function api_delete_product(
       });
   });
 }
+
+export function api_get_all_users(
+  accessToken: string
+) {
+    return new Promise<FetchedUser[]>((resolve, reject) => {
+      fetch(`${url}/api/users/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+        .then((res) => {
+          if (res.ok) {
+            resolve(res.json());
+          } else {
+            throw res;
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+}
