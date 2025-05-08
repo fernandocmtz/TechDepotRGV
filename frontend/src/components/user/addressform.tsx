@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
   api_get_active_user_addresses,
+  api_post_active_user_address,
   api_put_active_user_address_by_id,
 } from "@/services/api";
 import { FetchedAddress } from "@/services/types";
@@ -20,7 +21,7 @@ const AddressForm: React.FC<{ accessToken: string }> = ({ accessToken }) => {
     city: "",
     state: "",
     zip_code: "",
-    country: "",
+    country: "United States",
   });
   const [editId, setEditId] = useState<number | null>(null);
 
@@ -49,17 +50,20 @@ const AddressForm: React.FC<{ accessToken: string }> = ({ accessToken }) => {
       if (editId) {
         try {
           await api_put_active_user_address_by_id(editId, form, accessToken);
-          fetchAddress();
           toast.success("Address updated.");
         } catch (err) {
           toast.error("Error updating address.");
         }
       } else {
-        await axios.post("http://localhost:5001/api/addresses", form, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        toast.success("Address added");
+        try {
+          await api_post_active_user_address(form, accessToken);
+          toast.success("Address added");
+        } catch (err) {
+          toast.error("Error adding address.");
+        }
       }
+
+      fetchAddress();
 
       setForm({
         address_line_1: "",
@@ -67,7 +71,7 @@ const AddressForm: React.FC<{ accessToken: string }> = ({ accessToken }) => {
         city: "",
         state: "",
         zip_code: "",
-        country: "",
+        country: "United States",
       });
       setEditId(null);
     } catch {

@@ -88,7 +88,7 @@ export type FetchedAddress = {
   updatedAt: string; // ISO datetime string
 };
 
-export type PutAddress = {
+export type PostPutAddress = {
   address_line_1: string;
   address_line_2: string | null;
   city: string;

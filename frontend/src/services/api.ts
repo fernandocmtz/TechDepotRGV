@@ -5,7 +5,7 @@ import {
   OrderData,
   PatchUser,
   Product,
-  PutAddress,
+  PostPutAddress,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -161,9 +161,37 @@ export function api_get_active_user_addresses(accessToken: string) {
   });
 }
 
+export function api_post_active_user_address(
+  addressData: PostPutAddress,
+  accessToken: string
+) {
+  return new Promise<{ message: string; address: FetchedAddress }>(
+    (resolve, reject) => {
+      fetch(`${url}/api/address/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(addressData),
+      })
+        .then((res) => {
+          if (res.ok) {
+            resolve(res.json());
+          } else {
+            throw res;
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    }
+  );
+}
+
 export function api_put_active_user_address_by_id(
   addressId: number,
-  addressData: PutAddress,
+  addressData: PostPutAddress,
   accessToken: string
 ) {
   return new Promise<{ message: string; address: FetchedAddress }>(
