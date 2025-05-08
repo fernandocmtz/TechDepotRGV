@@ -13,6 +13,7 @@ import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
 import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
+import Profile from './components/user/Profile';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => {
             <Route path="/admin" element={<Admin />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>

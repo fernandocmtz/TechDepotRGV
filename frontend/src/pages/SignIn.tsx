@@ -64,35 +64,68 @@ const SignIn = () => {
   });
 
   // Submit handlers
-  const onSignInSubmit = (values: z.infer<typeof signInSchema>) => {
-    // This would be replaced with actual API call
-    console.log('Sign in submitted:', values);
-    
-    // Simulate API call with timeout
-    toast.loading('Signing in...');
-    
-    setTimeout(() => {
+  const onSignInSubmit = async (values: z.infer<typeof signInSchema>) => {
+    try {
+      toast.loading('Signing in...');
+  
+      const response = await fetch('http://localhost:5001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+        }),
+      });
+  
+      const data = await response.json();
       toast.dismiss();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+  
+      localStorage.setItem('token', data.token);
       toast.success('Signed in successfully!');
-      navigate('/');
-    }, 1500);
+      navigate('/profile');
+    } catch (err: any) {
+      toast.error(err.message || 'Login failed');
+    }
   };
 
-  const onSignUpSubmit = (values: z.infer<typeof signUpSchema>) => {
-    // This would be replaced with actual API call
-    console.log('Sign up submitted:', values);
-    
-    // Simulate API call with timeout
-    toast.loading('Creating your account...');
-    
-    setTimeout(() => {
+  const onSignUpSubmit = async (values: z.infer<typeof signUpSchema>) => {
+    try {
+      toast.loading('Creating your account...');
+  
+      const response = await fetch('http://localhost:5001/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: values.username,
+          email: values.email,
+          password: values.password,
+          role: 'user', 
+        }),
+      });
+  
+      const data = await response.json();
       toast.dismiss();
+  
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+  
       toast.success('Account created successfully!');
       setActiveTab('signin');
       signInForm.setValue('username', values.username);
-    }, 1500);
+    } catch (err: any) {
+      toast.error(err.message || 'Registration failed');
+    }
   };
-
+  
   return (
     <Layout>
       <div className="container max-w-md mx-auto py-12">

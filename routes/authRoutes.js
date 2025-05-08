@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, register } from '../controllers/authController.js';
+import { login, register, updateUser } from '../controllers/authController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 import { authorizeRoles } from '../middleware/roleMiddleware.js';
 
@@ -13,6 +13,14 @@ router.post('/register', register);
 router.get('/protected', authenticateUser, (req, res) => {
   res.json({ message: 'You have accessed a protected route', user: req.user });
 });
+
+// Get current user info
+router.get('/active_user', authenticateUser, (req, res) => {
+  res.json(req.user); // Assumes your middleware sets req.user from JWT
+});
+
+// Update current user's info
+router.put('/users', authenticateUser, updateUser);
 
 // Admin-only route
 router.get('/admin', authenticateUser, authorizeRoles('admin'), (req, res) => {

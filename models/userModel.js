@@ -31,7 +31,8 @@ export const User = sequelize.define('User', {
     },
     password:{
         type:DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        field: 'password_hash'
     },
     address_id:{
         type:DataTypes.INTEGER,
