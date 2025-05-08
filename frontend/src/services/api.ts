@@ -317,3 +317,27 @@ export function api_put_product(
       });
   });
 }
+
+export function api_delete_product(
+  accessToken: string,
+  deleteProductId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/${deleteProductId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}

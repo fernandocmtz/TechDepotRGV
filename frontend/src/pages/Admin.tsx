@@ -20,7 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProducts } from "@/hooks/useProducts";
-import { api_post_product, api_put_product } from "@/services/api";
+import {
+  api_delete_product,
+  api_post_product,
+  api_put_product,
+} from "@/services/api";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Admin = () => {
@@ -52,7 +56,10 @@ const Admin = () => {
     setFormData((prev) => ({ ...prev, category_id: value }));
   };
 
-  const handleProductDelete = (productId) => {};
+  const handleProductDelete = async (productId) => {
+    await api_delete_product(accessToken, productId);
+    fetchProducts();
+  };
 
   const openModal = (product = null) => {
     setEditingProduct(product);
