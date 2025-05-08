@@ -290,3 +290,30 @@ export function api_post_product(
       });
   });
 }
+
+export function api_put_product(
+  accessToken: string,
+  editProductId: number,
+  productData: PostProduct
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/${editProductId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(productData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}

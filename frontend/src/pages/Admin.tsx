@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProducts } from "@/hooks/useProducts";
-import { api_post_product } from "@/services/api";
+import { api_post_product, api_put_product } from "@/services/api";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Admin = () => {
@@ -37,11 +37,11 @@ const Admin = () => {
   const { accessToken } = useAuth();
 
   const { categories } = useCategories();
-  const { products, refresh } = useProducts();
+  const { products, refresh: fetchProducts } = useProducts();
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -98,10 +98,18 @@ const Admin = () => {
         category_id: Number(formData.category_id),
       };
 
-      await api_post_product(accessToken, productData);
+      if (editingProduct) {
+        await api_put_product(
+          accessToken,
+          editingProduct.product_id,
+          productData
+        );
+      } else {
+        await api_post_product(accessToken, productData);
+      }
       toast({ title: "Success", description: "Product saved" });
       setOpen(false);
-      // fetchProducts();
+      fetchProducts();
     } catch {
       toast({
         variant: "destructive",
