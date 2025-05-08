@@ -1,52 +1,70 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { toast } from 'sonner';
-import { User, Lock, Mail, UserPlus, LogIn, ArrowRight } from 'lucide-react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { toast } from "sonner";
+import { User, Lock, Mail, UserPlus, LogIn, ArrowRight } from "lucide-react";
+import { useAuth } from "@/context/auth/useAuth";
 
 // Define validation schema for sign-in form
 const signInSchema = z.object({
-  username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  username: z.string(),
+  password: z.string(),
   rememberMe: z.boolean().optional(),
 });
 
 // Define validation schema for sign-up form
-const signUpSchema = z.object({
-  fullName: z.string().min(3, { message: 'Full name must be at least 3 characters' }),
-  email: z.string().email({ message: 'Please enter a valid email address' }),
-  username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters' })
-    .regex(/[A-Z]/, { message: 'Password must contain at least one uppercase letter' })
-    .regex(/[0-9]/, { message: 'Password must contain at least one number' }),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine(val => val === true, {
-    message: 'You must agree to the terms and conditions',
-  }),
-}).refine(data => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
-});
+const signUpSchema = z
+  .object({
+    firstName: z.string().min(0, { message: "First name must not be empty" }),
+    lastName: z.string().min(0, { message: "Last name must not be empty" }),
+    email: z.string().email({ message: "Please enter a valid email address" }),
+    username: z
+      .string()
+      .min(3, { message: "Username must be at least 3 characters" }),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+    confirmPassword: z.string(),
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the terms and conditions",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('signin');
-  
+  const [activeTab, setActiveTab] = useState("signin");
+
+  const { login, register } = useAuth();
+
   // Initialize forms
   const signInForm = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       rememberMe: false,
     },
   });
@@ -54,75 +72,55 @@ const SignIn = () => {
   const signUpForm = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      fullName: '',
-      email: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
       terms: false,
     },
   });
 
   // Submit handlers
   const onSignInSubmit = async (values: z.infer<typeof signInSchema>) => {
-    try {
-      toast.loading('Signing in...');
-  
-      const response = await fetch('http://localhost:5001/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password,
-        }),
-      });
-  
-      const data = await response.json();
+    const { ok, message } = await login(values.username, values.password);
+
+    if (ok) {
       toast.dismiss();
-  
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-  
-      localStorage.setItem('token', data.token);
-      toast.success('Signed in successfully!');
-      navigate('/profile');
-    } catch (err: any) {
-      toast.error(err.message || 'Login failed');
+      toast.success("Signed in successfully!");
+      navigate("/");
+    } else {
+      signInForm.setError("username", {
+        type: "manual",
+        message: "",
+      });
+
+      signInForm.setError("password", {
+        type: "manual",
+        message: "",
+      });
+
+      toast.error(message || "Sign In error occurred");
     }
   };
 
   const onSignUpSubmit = async (values: z.infer<typeof signUpSchema>) => {
-    try {
-      toast.loading('Creating your account...');
-  
-      const response = await fetch('http://localhost:5001/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: values.username,
-          email: values.email,
-          password: values.password,
-          role: 'user', 
-        }),
-      });
-  
-      const data = await response.json();
+    const { ok, message } = await register(
+      values.username,
+      values.firstName,
+      values.lastName,
+      values.email,
+      values.password
+    );
+
+    if (ok) {
       toast.dismiss();
-  
-      if (!response.ok) {
-        throw new Error(data.message || 'Registration failed');
-      }
-  
-      toast.success('Account created successfully!');
-      setActiveTab('signin');
-      signInForm.setValue('username', values.username);
-    } catch (err: any) {
-      toast.error(err.message || 'Registration failed');
+      toast.success("Account created successfully!");
+      setActiveTab("signin");
+      signInForm.setValue("username", values.username);
+    } else {
+      toast.error(message || "Registration error occurred");
     }
   };
   
@@ -132,10 +130,17 @@ const SignIn = () => {
         <div className="space-y-6 bg-card shadow-lg rounded-lg p-8 border border-border">
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold">Welcome</h1>
-            <p className="text-muted-foreground">Sign in to access your account or create a new one</p>
+            <p className="text-muted-foreground">
+              Sign in to access your account or create a new one
+            </p>
           </div>
 
-          <Tabs defaultValue="signin" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            defaultValue="signin"
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid grid-cols-2 mb-8">
               <TabsTrigger value="signin" className="flex items-center gap-2">
                 <LogIn className="h-4 w-4" />
@@ -150,7 +155,10 @@ const SignIn = () => {
             {/* Sign In Form */}
             <TabsContent value="signin" className="space-y-6">
               <Form {...signInForm}>
-                <form onSubmit={signInForm.handleSubmit(onSignInSubmit)} className="space-y-6">
+                <form
+                  onSubmit={signInForm.handleSubmit(onSignInSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={signInForm.control}
                     name="username"
@@ -160,7 +168,11 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="username" className="pl-10" {...field} />
+                            <Input
+                              placeholder="username"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -177,7 +189,12 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -186,21 +203,17 @@ const SignIn = () => {
                   />
 
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="remember" 
-                        onCheckedChange={(checked) => {
-                          signInForm.setValue('rememberMe', checked === true);
-                        }} 
-                      />
-                      <label
-                        htmlFor="remember"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Remember me
-                      </label>
-                    </div>
-                    <Button variant="link" className="px-0" onClick={() => toast.info('Password reset functionality would be implemented here')}>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="px-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toast.info(
+                          "Password reset functionality would be implemented here, with a reset password email sent to the user."
+                        );
+                      }}
+                    >
                       Forgot password?
                     </Button>
                   </div>
@@ -216,17 +229,45 @@ const SignIn = () => {
             {/* Sign Up Form */}
             <TabsContent value="signup" className="space-y-6">
               <Form {...signUpForm}>
-                <form onSubmit={signUpForm.handleSubmit(onSignUpSubmit)} className="space-y-6">
+                <form
+                  onSubmit={signUpForm.handleSubmit(onSignUpSubmit)}
+                  className="space-y-6"
+                >
                   <FormField
                     control={signUpForm.control}
-                    name="fullName"
+                    name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>First Name</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="John Doe" className="pl-10" {...field} />
+                            <Input
+                              placeholder="John"
+                              className="pl-10"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={signUpForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              placeholder="Doe"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -243,7 +284,11 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="john.doe@example.com" className="pl-10" {...field} />
+                            <Input
+                              placeholder="john.doe@example.com"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -260,7 +305,11 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input placeholder="johndoe" className="pl-10" {...field} />
+                            <Input
+                              placeholder="johndoe"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -277,7 +326,12 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -294,7 +348,12 @@ const SignIn = () => {
                         <FormControl>
                           <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              className="pl-10"
+                              {...field}
+                            />
                           </div>
                         </FormControl>
                         <FormMessage />
