@@ -51,6 +51,7 @@ const Profile: React.FC = () => {
         <UserForm
           user={user}
           onUserUpdate={setUser as (u: FetchedUser) => void}
+          accessToken={accessToken}
         />
       </div>
 

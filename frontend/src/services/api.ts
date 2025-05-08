@@ -1,4 +1,4 @@
-import { Category, FetchedUser, OrderData, Product } from "./types";
+import { Category, FetchedUser, OrderData, PatchUser, Product } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -92,6 +92,32 @@ export function api_get_active_user(accessToken: string) {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_patch_active_user(
+  userData: PatchUser,
+  accessToken: string
+) {
+  return new Promise<FetchedUser>((resolve, reject) => {
+    fetch(`${url}/api/users/active`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(userData),
     })
       .then((res) => {
         if (res.ok) {

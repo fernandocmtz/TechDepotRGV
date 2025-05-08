@@ -60,6 +60,11 @@ export type OrderPaymentData = {
   card_cvv: string;
 };
 
+export type PatchUser = {
+  email: FetchedUser["email"];
+  phone_number: FetchedUser["phone_number"];
+};
+
 export type FetchedUser = {
   user_id: number;
   email: string;

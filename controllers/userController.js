@@ -23,6 +23,28 @@ export const getActiveUser = async (req, res) => {
   }
 };
 
+export const patchActiveUser = async (req, res) => {
+  try {
+    const userId = req.user?.id ?? null;
+
+    const { email, phone_number } = req.body;
+
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    if (email !== undefined) user.email = email;
+    if (phone_number !== undefined) user.phone_number = phone_number;
+
+    await user.save();
+    const safeUser = user.toJSON();
+    delete safeUser.password;
+
+    res.json(safeUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const utilFindOrCreateUserByUserId = async (user_id) => {
   const [user] = await User.findOrCreate({
     where: { user_id },
