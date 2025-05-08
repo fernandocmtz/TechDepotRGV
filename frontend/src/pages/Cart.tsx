@@ -14,7 +14,12 @@ import { api_post_order } from "@/services/api";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Cart = () => {
-  const { cartItems: cartItemsV2, updateCartItem, removeFromCart } = useCart();
+  const {
+    cartItems: cartItemsV2,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+  } = useCart();
   const { products, refresh, loading, clear } = useProducts();
   const { accessToken } = useAuth();
 
@@ -154,6 +159,7 @@ const Cart = () => {
         title: "Success",
         description: "Successfully placed order",
       });
+      clearCart();
     } catch (err) {
       setError(err.message);
     }
