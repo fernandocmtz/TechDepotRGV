@@ -5,12 +5,15 @@ import AddressForm from "@/components/user/addressform";
 import { useAuth } from "@/context/auth/useAuth";
 import { api_get_active_user } from "@/services/api";
 import { FetchedUser } from "@/services/types";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<FetchedUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { accessToken } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -33,8 +36,14 @@ const Profile: React.FC = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-10">
+      {" "}
       {/* Welcome Header */}
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
+        <div className="absolute top-4 left-4">
+          <Button variant="outline" onClick={() => navigate("/")}>
+            ← Back
+          </Button>
+        </div>
         <h2 className="text-2xl font-bold mb-1 flex items-center gap-2">
           👤 Profile
         </h2>
@@ -44,7 +53,6 @@ const Profile: React.FC = () => {
           !
         </p>
       </div>
-
       {/* User Info Form */}
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
         <h3 className="text-xl font-semibold mb-4">📝 Update General Info</h3>
@@ -54,7 +62,6 @@ const Profile: React.FC = () => {
           accessToken={accessToken}
         />
       </div>
-
       {/* Address Management */}
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
         <h3 className="text-xl font-semibold mb-4">🏠 Manage Addresses</h3>
