@@ -99,14 +99,16 @@ const OrderedItems: React.FC<{ accessToken: string }> = ({ accessToken }) => {
                   </div>
                 </div>
 
-                <div className="flex justify-end">
-                  <Button
-                    variant="destructive"
-                    onClick={() => returnItem(item.order_item_id)}
-                  >
-                    Return
-                  </Button>
-                </div>
+                {item.shipment_status === "delivered" && (
+                  <div className="flex justify-end">
+                    <Button
+                      variant="destructive"
+                      onClick={() => returnItem(item.order_item_id)}
+                    >
+                      Return
+                    </Button>
+                  </div>
+                )}
               </div>
             ))
           )}

@@ -6,7 +6,8 @@ import {
   processReturn as processReturnFromDB,
   Return,
 } from "../models/returnModel.js"; // ✅ Renamed the import
-import { RETURN_STATUS } from "../utils/constants.js";
+import { Shipment } from "../models/shipmentModel.js";
+import { RETURN_STATUS, SHIPMENT_STATUS } from "../utils/constants.js";
 import { v4 as uuidv4 } from "uuid";
 
 export const processReturn = async (req, res) => {
@@ -25,6 +26,10 @@ export const processReturn = async (req, res) => {
             { model: Product }, // optional
           ],
         },
+        {
+          model: Shipment,
+          attributes: ["status"],
+        },
       ],
     });
     // Flatten and filter only non-returned items
@@ -32,11 +37,14 @@ export const processReturn = async (req, res) => {
       order.OrderItems.filter((item) => item.Return === null).map((item) => ({
         order_item_id: item.order_item_id,
         product_id: item.Product?.product_id,
+        shipment_status: order.Shipment.status,
       }))
     );
 
     const returnOrderItem = orderItems.find(
-      (orderItem) => (orderItem.order_item_id = order_item_id)
+      (orderItem) =>
+        orderItem.order_item_id === order_item_id &&
+        orderItem.shipment_status === SHIPMENT_STATUS.DELIVERED
     );
 
     if (!returnOrderItem) {
