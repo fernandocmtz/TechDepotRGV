@@ -98,11 +98,27 @@ export type PostPutAddress = {
 };
 
 export type FetchOrderItems = {
+  orderedItems: FetchNonReturnedOrderItems[];
+  returnedItems: FetchReturnedItems[];
+};
+
+export type FetchNonReturnedOrderItems = {
   ordered_at: string;
   order_item_id: number;
   order_id: number;
   product_name: string;
   price: number;
+  order_status: string;
+  shipment_status: string;
+};
+
+export type FetchReturnedItems = {
+  ordered_at: string;
+  order_item_id: number;
+  order_id: number;
+  product_name: string;
+  price: number;
+  status: string;
 };
 
 export type PostReturn = {

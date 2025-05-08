@@ -221,7 +221,7 @@ export function api_put_active_user_address_by_id(
 }
 
 export function api_get_active_user_order_items(accessToken: string) {
-  return new Promise<FetchOrderItems[]>((resolve, reject) => {
+  return new Promise<FetchOrderItems>((resolve, reject) => {
     fetch(`${url}/api/order-items/`, {
       method: "GET",
       headers: {

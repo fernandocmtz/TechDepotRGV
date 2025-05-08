@@ -2,6 +2,7 @@ import { OrderItem } from "../models/orderitemModel.js";
 import { Order } from "../models/orderModel.js";
 import { Product } from "../models/productModel.js";
 import { Return } from "../models/returnModel.js";
+import { Shipment } from "../models/shipmentModel.js";
 
 // Get all order items
 export const getAllOrderItems = async (req, res) => {
@@ -16,6 +17,10 @@ export const getAllOrderItems = async (req, res) => {
             { model: Product },
           ],
         },
+        {
+          model: Shipment,
+          attributes: ["status"],
+        },
       ],
     });
     // Flatten and filter only non-returned items
@@ -26,10 +31,23 @@ export const getAllOrderItems = async (req, res) => {
         order_id: item.order_id,
         product_name: item.Product?.name,
         price: item.Product?.price,
+        order_status: order.status,
+        shipment_status: order.Shipment.status,
       }))
     );
 
-    res.json(items);
+    const returnedItems = orders.flatMap((order) =>
+      order.OrderItems.filter((item) => item.Return !== null).map((item) => ({
+        ordered_at: order.createdAt,
+        order_item_id: item.order_item_id,
+        order_id: item.order_id,
+        product_name: item.Product?.name,
+        price: item.Product?.price,
+        status: item.Return.status,
+      }))
+    );
+
+    res.json({ orderedItems: items, returnedItems: returnedItems });
   } catch (error) {
     res
       .status(500)
