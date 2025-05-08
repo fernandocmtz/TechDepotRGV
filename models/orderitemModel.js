@@ -25,14 +25,6 @@ export const OrderItem = sequelize.define(
         key: "product_id",
       },
     },
-    return_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "returns",
-        key: "return_id",
-      },
-    },
     item_sale_price: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,

@@ -1,18 +1,10 @@
-import express from 'express';
-import {
-  getAllOrderItems,
-  getOrderItemById,
-  createOrderItem,
-  updateOrderItem,
-  deleteOrderItem
-} from '../controllers/orderitemController.js';
+import express from "express";
+import { getAllOrderItems } from "../controllers/orderitemController.js";
+
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.get('/', getAllOrderItems);
-router.get('/:id', getOrderItemById);
-router.post('/', createOrderItem);
-router.put('/:id', updateOrderItem);
-router.delete('/:id', deleteOrderItem);
+router.get("/", verifyToken, getAllOrderItems);
 
 export default router;

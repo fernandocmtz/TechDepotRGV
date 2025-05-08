@@ -39,10 +39,6 @@ export const associateModels = () => {
   Order.hasMany(OrderItem, { foreignKey: "order_id", onDelete: "CASCADE" });
   OrderItem.belongsTo(Order, { foreignKey: "order_id" });
 
-  // Product - OrderItems
-  Product.hasMany(OrderItem, { foreignKey: "product_id", onDelete: "CASCADE" });
-  OrderItem.belongsTo(Product, { foreignKey: "product_id" });
-
   // Order - Payment
   Order.hasOne(Payment, { foreignKey: "order_id", onDelete: "CASCADE" });
   Payment.belongsTo(Order, { foreignKey: "order_id" });
@@ -51,11 +47,14 @@ export const associateModels = () => {
   Order.hasOne(Shipment, { foreignKey: "order_id", onDelete: "CASCADE" });
   Shipment.belongsTo(Order, { foreignKey: "order_id" });
 
-  // User - Return
-  User.hasMany(Return, { foreignKey: "user_id", onDelete: "CASCADE" });
-  Return.belongsTo(User, { foreignKey: "user_id" });
+  // Product - OrderItems
+  Product.hasMany(OrderItem, { foreignKey: "product_id", onDelete: "CASCADE" });
+  OrderItem.belongsTo(Product, { foreignKey: "product_id" });
 
-  // Product - Return
-  Product.hasMany(Return, { foreignKey: "product_id", onDelete: "CASCADE" });
-  Return.belongsTo(Product, { foreignKey: "product_id" });
+  // OrderItem - Return
+  OrderItem.hasOne(Return, {
+    foreignKey: "order_item_id",
+    onDelete: "CASCADE",
+  });
+  Return.belongsTo(OrderItem, { foreignKey: "order_item_id" });
 };
