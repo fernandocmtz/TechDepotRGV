@@ -1,58 +1,53 @@
-import { sequelize } from '../config/db.js';
-import { DataTypes } from 'sequelize';
-
+import { sequelize } from "../config/db.js";
+import { DataTypes } from "sequelize";
 
 // Define the User model
-export const User = sequelize.define('User', {
+export const User = sequelize.define(
+  "User",
+  {
     user_id: {
-        type:DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     username: {
-        type:DataTypes.STRING(50),
-        allowNull: false,
-        unique: true
+      type: DataTypes.STRING(50),
+      allowNull: false,
+      unique: true,
     },
     first_name: {
-        type:DataTypes.STRING(50),
-        allowNull: false
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
-    last_name:{
-        type:DataTypes.STRING(50),
-        allowNull:false
+    last_name: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
     },
-    email:{
-        type:DataTypes.STRING(100),
-        allowNull:false
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
     },
-    phone_number:{
-        type:DataTypes.STRING(10),
+    phone_number: {
+      type: DataTypes.STRING(10),
     },
-    password:{
-        type:DataTypes.STRING,
-        allowNull: false,
-        field: 'password_hash'
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    address_id:{
-        type:DataTypes.INTEGER,
-        refernece: {
-            model: 'address_id',
-            key: 'address_id'
-        }
-    },
-    role: { type: DataTypes.STRING, allowNull: false, defaultValue: 'user' },
-}, {
-     tableName: 'users',
-     timestamps: false });
-
+    role: { type: DataTypes.STRING, allowNull: false, defaultValue: "user" },
+  },
+  {
+    tableName: "users",
+    timestamps: false,
+  }
+);
 
 // Fetch all users
 export const getAllUsers = async () => {
-    return await User.findAll();
+  return await User.findAll();
 };
 
 // Fetch user by ID
 export const getUserById = async (id) => {
-    return await User.findByPk(id);
+  return await User.findByPk(id);
 };

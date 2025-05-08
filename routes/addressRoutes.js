@@ -1,26 +1,24 @@
-import express from 'express';
+import express from "express";
 import {
   getUserAddresses,
   addAddress,
   updateAddress,
-  deleteAddress
-} from '../controllers/addressController.js';
-import { authenticateUser } from '../middleware/authMiddleware.js';
+  deleteAddress,
+} from "../controllers/addressController.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.use(authenticateUser);
-
 // GET all addresses for logged-in user
-router.get('/', getUserAddresses);
+router.get("/", verifyToken, getUserAddresses);
 
 // POST a new address
-router.post('/', addAddress);
+router.post("/", verifyToken, addAddress);
 
 // PUT update an existing address
-router.put('/:id', updateAddress);
+router.put("/:id", verifyToken, updateAddress);
 
 // DELETE an address
-router.delete('/:id', deleteAddress);
+router.delete("/:id", verifyToken, deleteAddress);
 
 export default router;

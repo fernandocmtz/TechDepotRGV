@@ -1,4 +1,4 @@
-import { Category, Product } from "./types";
+import { Category, OrderData, Product } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -52,6 +52,31 @@ export function api_get_all_categories() {
           resolve(res.json());
         } else {
           throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_order(orderData: OrderData, accessToken: string) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(orderData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          return res.json().then((errBody) => {
+            throw new Error(errBody.error || "Request failed");
+          });
         }
       })
       .catch((err) => {

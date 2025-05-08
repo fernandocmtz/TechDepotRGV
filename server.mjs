@@ -15,12 +15,14 @@ import orderRoutes from "./routes/orderRoutes.js";
 import returnRoutes from "./routes/returnRoutes.js";
 import shipmentRoutes from "./routes/shipmentRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import addressRoutes from "./routes/addressRoutes.js";
 import orderitemRoutes from "./routes/orderitemRoutes.js";
 
 // Model Associations
 import { associateModels } from "./models/associations.js"; // Ensure associations are set up
 // Import Error Handler
 import errorHandler from "./middleware/errorHandler.js";
+import { prepareModels } from "./models/preparations.js";
 
 // Load environment variables
 dotenv.config();
@@ -50,6 +52,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/shipments", shipmentRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/address", addressRoutes);
 app.use("/api/order-items", orderitemRoutes);
 
 // Error handling middleware
@@ -65,6 +68,7 @@ app.listen(PORT, async () => {
     console.log("Database connected successfully.");
 
     await associateModels(); // Call the function to set up associations
+    prepareModels();
     console.log("✅ All models were associated successfully.");
 
     // Recreate all tables from models

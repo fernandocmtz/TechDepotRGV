@@ -45,61 +45,78 @@ export const getProductById = async (req, res, next) => {
 export const getFilteredProducts = async (req, res, next) => {
   try {
     const { minPrice, maxPrice, category_id, product_ids } = req.body;
-    const whereClause = {};
 
-    // Product ID filter
-    if (product_ids?.length) {
-      whereClause.product_id = {
-        [Op.in]: product_ids,
-      };
-    }
-
-    // Price filter
-    if (minPrice || maxPrice) {
-      whereClause.price = {};
-      if (minPrice !== undefined)
-        whereClause.price[Op.gte] = parseFloat(minPrice);
-      if (maxPrice !== undefined)
-        whereClause.price[Op.lte] = parseFloat(maxPrice);
-    }
-
-    // Category filter (join with Category model)
-    const includeClause = [
-      {
-        model: Category,
-        attributes: ["name"], // Optional: only fetch the 'name' column
-      },
-      {
-        model: Inventory,
-        attributes: [],
-      },
-    ];
-    if (category_id) {
-      includeClause.push({
-        model: Category,
-        where: { category_id },
-        attributes: [],
-      });
-    }
-
-    const products = await Product.findAll({
-      attributes: {
-        include: [
-          [
-            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
-            "inventory_count",
-          ],
-        ],
-      },
-      where: whereClause,
-      include: includeClause,
-      group: ["Product.product_id", "Category.category_id"],
+    const products = await utilsGetFilteredProducts({
+      minPrice,
+      maxPrice,
+      category_id,
+      product_ids,
     });
 
     res.json(products);
   } catch (err) {
     next(err);
   }
+};
+
+export const utilsGetFilteredProducts = async ({
+  minPrice,
+  maxPrice,
+  category_id,
+  product_ids,
+}) => {
+  const whereClause = {};
+
+  // Product ID filter
+  if (product_ids?.length) {
+    whereClause.product_id = {
+      [Op.in]: product_ids,
+    };
+  }
+
+  // Price filter
+  if (minPrice || maxPrice) {
+    whereClause.price = {};
+    if (minPrice !== undefined)
+      whereClause.price[Op.gte] = parseFloat(minPrice);
+    if (maxPrice !== undefined)
+      whereClause.price[Op.lte] = parseFloat(maxPrice);
+  }
+
+  // Category filter (join with Category model)
+  const includeClause = [
+    {
+      model: Category,
+      attributes: ["name"], // Optional: only fetch the 'name' column
+    },
+    {
+      model: Inventory,
+      attributes: [],
+    },
+  ];
+  if (category_id) {
+    includeClause.push({
+      model: Category,
+      where: { category_id },
+      attributes: [],
+    });
+  }
+
+  const products = await Product.findAll({
+    attributes: {
+      include: [
+        [
+          Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+          "inventory_count",
+        ],
+      ],
+    },
+    where: whereClause,
+    include: includeClause,
+    group: ["Product.product_id", "Category.category_id"],
+  });
+
+  return products;
 };
 
 export const createProduct = async (req, res, next) => {
