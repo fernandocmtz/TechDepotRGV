@@ -1,27 +1,27 @@
 import { sequelize } from "../config/db.js";
 import { DataTypes } from "sequelize";
-import { utilfindOrCreateAddress } from "../controllers/addressController.js";
-import { utilFindOrCreateUserByUserId } from "../controllers/userController.js";
 import { ORDER_STATUS } from "../utils/constants.js";
 
-export const Order = sequelize.define('Order', {
-  order_id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'users',
-      key: 'user_id'
-    }
-  },
-  address_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
+export const Order = sequelize.define(
+  "Order",
+  {
+    order_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "user_id",
+      },
+    },
+    address_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM(
         ORDER_STATUS.CANCELLED,
@@ -31,7 +31,9 @@ export const Order = sequelize.define('Order', {
       ),
       allowNull: false,
     },
-}, {
-  tableName: 'orders',
-  timestamps: true
-});
+  },
+  {
+    tableName: "orders",
+    timestamps: true,
+  }
+);
