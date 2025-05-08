@@ -1,11 +1,53 @@
-import { createOrder } from '../models/orderModel.js';
+import { Order } from '../models/orderModel.js';
 
-export const placeOrder = async (req, res) => {
-    try {
-        const { userId, addressId, status } = req.body;
-        const orderId = await createOrder(userId, addressId, status);
-        res.json({ message: "Order placed successfully", orderId });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+export const createOrder = async (req, res, next) => {
+  try {
+    const newOrder = await Order.create(req.body);
+    res.status(201).json(newOrder);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.findAll();
+    res.json(orders);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getOrderById = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    await order.update(req.body);
+    res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteOrder = async (req, res, next) => {
+  try {
+    const order = await Order.findByPk(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    await order.destroy();
+    res.json({ message: 'Order deleted' });
+  } catch (err) {
+    next(err);
+  }
 };
