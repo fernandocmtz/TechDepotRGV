@@ -1,24 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import UserForm from "@/components/user/userform";
-import PaymentMethodManager from "@/components/user/paymentmethodmanager";
 import AddressForm from "@/components/user/addressform";
 import { useAuth } from "@/context/auth/useAuth";
-
-interface User {
-  user_id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number?: string;
-  role?: string;
-  password: string;
-  address_id: string;
-}
+import { api_get_active_user } from "@/services/api";
+import { FetchedUser } from "@/services/types";
 
 const Profile: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<FetchedUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { accessToken } = useAuth();
@@ -26,14 +15,8 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get<User>(
-          "http://localhost:5001/api/auth/active_user",
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-
-        setUser(res.data);
+        const user = await api_get_active_user(accessToken);
+        setUser(user);
       } catch (err) {
         setError("Failed to load user information.");
       } finally {
@@ -65,13 +48,10 @@ const Profile: React.FC = () => {
       {/* User Info Form */}
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
         <h3 className="text-xl font-semibold mb-4">📝 Update General Info</h3>
-        <UserForm user={user} onUserUpdate={setUser as (u: User) => void} />
-      </div>
-
-      {/* Payment Methods */}
-      <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
-        <h3 className="text-xl font-semibold mb-4">💳 Manage Payments</h3>
-        <PaymentMethodManager />
+        <UserForm
+          user={user}
+          onUserUpdate={setUser as (u: FetchedUser) => void}
+        />
       </div>
 
       {/* Address Management */}

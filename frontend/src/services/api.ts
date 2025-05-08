@@ -1,4 +1,4 @@
-import { Category, OrderData, Product } from "./types";
+import { Category, FetchedUser, OrderData, Product } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -77,6 +77,27 @@ export function api_post_order(orderData: OrderData, accessToken: string) {
           return res.json().then((errBody) => {
             throw new Error(errBody.error || "Request failed");
           });
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_get_active_user(accessToken: string) {
+  return new Promise<FetchedUser>((resolve, reject) => {
+    fetch(`${url}/api/users/active`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
         }
       })
       .catch((err) => {

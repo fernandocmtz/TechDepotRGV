@@ -59,3 +59,13 @@ export type OrderPaymentData = {
   card_expiry: string;
   card_cvv: string;
 };
+
+export type FetchedUser = {
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone_number: string | null;
+  role: string;
+};

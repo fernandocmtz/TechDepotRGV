@@ -12,6 +12,17 @@ export const getUsers = async (req, res) => {
   }
 };
 
+export const getActiveUser = async (req, res) => {
+  try {
+    const userId = req.user?.id ?? null;
+
+    const user = await getUserById(userId);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const utilFindOrCreateUserByUserId = async (user_id) => {
   const [user] = await User.findOrCreate({
     where: { user_id },
