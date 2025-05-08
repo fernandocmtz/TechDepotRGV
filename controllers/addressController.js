@@ -15,16 +15,10 @@ export const getUserAddresses = async (req, res) => {
 
 export const createAddress = async (req, res) => {
   try {
-    const {
-      address_line_1,
-      address_line_2,
-      city,
-      state,
-      postal_code,
-      country,
-    } = req.body;
+    const { address_line_1, address_line_2, city, state, zip_code, country } =
+      req.body;
 
-    if (!address_line_1 || !city || !state || !postal_code || !country) {
+    if (!address_line_1 || !city || !state || !zip_code || !country) {
       return res
         .status(400)
         .json({ message: "Missing required address fields." });
@@ -36,7 +30,7 @@ export const createAddress = async (req, res) => {
       address_line_2,
       city,
       state,
-      postal_code,
+      zip_code,
       country,
     });
 
@@ -54,7 +48,7 @@ export const utilfindOrCreateAddress = async (addressData) => {
       address_line_2: addressData.address_line_2 || null,
       city: addressData.city,
       state: addressData.state,
-      postal_code: addressData.postal_code,
+      zip_code: addressData.zip_code,
       country: addressData.country,
       user_id: addressData.user_id,
     },
@@ -68,7 +62,7 @@ export const utilfindOrCreateAddress = async (addressData) => {
 export const updateAddress = async (req, res) => {
   try {
     const { id } = req.params;
-    const { address_line1, address_line2, city, state, postal_code, country } =
+    const { address_line_1, address_line_2, city, state, zip_code, country } =
       req.body;
 
     const address = await Address.findOne({
@@ -80,11 +74,11 @@ export const updateAddress = async (req, res) => {
     }
 
     await address.update({
-      address_line1,
-      address_line2,
+      address_line_1,
+      address_line_2,
       city,
       state,
-      postal_code,
+      zip_code,
       country,
     });
 

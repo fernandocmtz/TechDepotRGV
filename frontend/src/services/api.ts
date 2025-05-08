@@ -1,4 +1,12 @@
-import { Category, FetchedUser, OrderData, PatchUser, Product } from "./types";
+import {
+  Category,
+  FetchedAddress,
+  FetchedUser,
+  OrderData,
+  PatchUser,
+  Product,
+  PutAddress,
+} from "./types";
 
 const url = import.meta.env.VITE_API_URL;
 
@@ -130,4 +138,54 @@ export function api_patch_active_user(
         reject(err);
       });
   });
+}
+
+export function api_get_active_user_addresses(accessToken: string) {
+  return new Promise<FetchedAddress[]>((resolve, reject) => {
+    fetch(`${url}/api/address/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_put_active_user_address_by_id(
+  addressId: number,
+  addressData: PutAddress,
+  accessToken: string
+) {
+  return new Promise<{ message: string; address: FetchedAddress }>(
+    (resolve, reject) => {
+      fetch(`${url}/api/address/${addressId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(addressData),
+      })
+        .then((res) => {
+          if (res.ok) {
+            resolve(res.json());
+          } else {
+            throw res;
+          }
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    }
+  );
 }

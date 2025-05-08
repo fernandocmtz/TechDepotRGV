@@ -58,7 +58,7 @@ const Profile: React.FC = () => {
       {/* Address Management */}
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
         <h3 className="text-xl font-semibold mb-4">🏠 Manage Addresses</h3>
-        <AddressForm />
+        <AddressForm accessToken={accessToken} />
       </div>
     </div>
   );

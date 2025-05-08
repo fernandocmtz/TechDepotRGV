@@ -74,3 +74,25 @@ export type FetchedUser = {
   phone_number: string | null;
   role: string;
 };
+
+export type FetchedAddress = {
+  address_id: number;
+  user_id: number;
+  address_line_1: string;
+  address_line_2: string | null;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
+};
+
+export type PutAddress = {
+  address_line_1: string;
+  address_line_2: string | null;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+};
