@@ -29,7 +29,7 @@ export const placeOrder = async (req, res) => {
       0
     );
 
-    const finalAmount = (subtotal + 10) * 1.07;
+    const finalAmount = subtotal * 1.07 + 10;
 
     // Payment
     const payment = await utilsSimulateCreatePayment(
