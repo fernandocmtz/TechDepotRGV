@@ -96,3 +96,11 @@ export type PostPutAddress = {
   zip_code: string;
   country: string;
 };
+
+export type FetchOrderItems = {
+  ordered_at: string;
+  order_item_id: number;
+  order_id: number;
+  product_name: string;
+  price: number;
+};

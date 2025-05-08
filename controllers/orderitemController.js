@@ -21,11 +21,11 @@ export const getAllOrderItems = async (req, res) => {
     // Flatten and filter only non-returned items
     const items = orders.flatMap((order) =>
       order.OrderItems.filter((item) => item.Return === null).map((item) => ({
+        ordered_at: order.createdAt,
         order_item_id: item.order_item_id,
         order_id: item.order_id,
         product_name: item.Product?.name,
-        quantity: item.quantity,
-        price: item.price,
+        price: item.Product?.price,
       }))
     );
 

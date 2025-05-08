@@ -7,6 +7,7 @@ import { api_get_active_user } from "@/services/api";
 import { FetchedUser } from "@/services/types";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import OrderedItems from "@/components/user/orderitemsform";
 
 const Profile: React.FC = () => {
   const [user, setUser] = useState<FetchedUser | null>(null);
@@ -66,6 +67,10 @@ const Profile: React.FC = () => {
       <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
         <h3 className="text-xl font-semibold mb-4">🏠 Manage Addresses</h3>
         <AddressForm accessToken={accessToken} />
+      </div>
+      <div className="rounded-xl border p-6 shadow-sm bg-white dark:bg-muted">
+        <h3 className="text-xl font-semibold mb-4">🏠 Ordered Items</h3>
+        <OrderedItems accessToken={accessToken} />
       </div>
     </div>
   );

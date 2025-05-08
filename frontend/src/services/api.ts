@@ -6,6 +6,7 @@ import {
   PatchUser,
   Product,
   PostPutAddress,
+  FetchOrderItems,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -216,4 +217,25 @@ export function api_put_active_user_address_by_id(
         });
     }
   );
+}
+
+export function api_get_active_user_order_items(accessToken: string) {
+  return new Promise<FetchOrderItems[]>((resolve, reject) => {
+    fetch(`${url}/api/order-items/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
 }
