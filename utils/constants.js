@@ -21,3 +21,11 @@ export const PAYMENT_STATUS = {
 export const PAYMENT_METHOD = {
   CREDIT_CARD: "creditcard",
 };
+
+export const SHIPMENT_STATUS = {
+  PREPARING: "preparing",
+  SHIPPED: "shipped",
+  DELIVERED: "delivered",
+};
+
+export const COURIERS = ["USPS", "UPS", "FedEx", "DHL", "Purolater"]

@@ -2,14 +2,17 @@ import { Address } from "../models/addressModel.js";
 import { Order } from "../models/orderModel.js";
 import { User } from "../models/userModel.js";
 import {
+  COURIERS,
   GUEST_USER,
   ORDER_STATUS,
   PAYMENT_METHOD,
   PAYMENT_STATUS,
+  SHIPMENT_STATUS,
 } from "../utils/constants.js";
 import { v4 as uuidv4 } from "uuid";
 import { utilsGetFilteredProducts } from "./productController.js";
 import { utilsSimulateCreatePayment } from "./paymentController.js";
+import { addShipment } from "../models/shipmentModel.js";
 
 export const createOrder = async (req, res, next) => {
   try {
@@ -125,6 +128,16 @@ export const createOrder = async (req, res, next) => {
     );
 
     const newOrder = await Order.findByPk(order.order_id);
+
+    const courier = COURIERS[Math.floor(Math.random() * COURIERS.length)];
+    const trackingNumber = uuidv4();
+
+    addShipment(
+      order.order_id,
+      courier,
+      trackingNumber,
+      SHIPMENT_STATUS.PREPARING
+    );
 
     res.status(201).json({ newOrder });
   } catch (err) {
