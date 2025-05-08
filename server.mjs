@@ -22,6 +22,7 @@ import orderitemRoutes from "./routes/orderitemRoutes.js";
 import { associateModels } from "./models/associations.js"; // Ensure associations are set up
 // Import Error Handler
 import errorHandler from "./middleware/errorHandler.js";
+import { prepareModels } from "./models/preparations.js";
 
 // Load environment variables
 dotenv.config();
@@ -67,6 +68,7 @@ app.listen(PORT, async () => {
     console.log("Database connected successfully.");
 
     await associateModels(); // Call the function to set up associations
+    prepareModels();
     console.log("✅ All models were associated successfully.");
 
     // Recreate all tables from models

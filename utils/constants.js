@@ -12,3 +12,12 @@ export const GUEST_USER = {
   PHONE_NUMBER: "0000000000",
   PASSWORD: "guestpassword",
 };
+
+export const PAYMENT_STATUS = {
+  APPROVED: "approved",
+  DECLINED: "declined",
+};
+
+export const PAYMENT_METHOD = {
+  CREDIT_CARD: "creditcard",
+};

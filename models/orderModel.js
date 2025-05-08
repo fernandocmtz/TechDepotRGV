@@ -51,5 +51,6 @@ export const createOrder = async (userId, address, status) => {
     address_id: verifiedAddress.id,
     status,
   });
-  return order.id;
+
+  return order.order_id;
 };
