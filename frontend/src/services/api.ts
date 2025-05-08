@@ -7,6 +7,7 @@ import {
   Product,
   PostPutAddress,
   FetchOrderItems,
+  PostReturn,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -226,6 +227,29 @@ export function api_get_active_user_order_items(accessToken: string) {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_return(accessToken: string, returnData: PostReturn) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/returns/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(returnData),
     })
       .then((res) => {
         if (res.ok) {

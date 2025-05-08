@@ -104,3 +104,8 @@ export type FetchOrderItems = {
   product_name: string;
   price: number;
 };
+
+export type PostReturn = {
+  order_item_id: number;
+  reason: string;
+};

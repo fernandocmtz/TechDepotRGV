@@ -3,7 +3,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axios from "axios";
-import { api_get_active_user_order_items } from "@/services/api";
+import {
+  api_get_active_user_order_items,
+  api_post_return,
+} from "@/services/api";
 import { FetchOrderItems } from "@/services/types";
 
 const OrderedItems: React.FC<{ accessToken: string }> = ({ accessToken }) => {
@@ -20,11 +23,10 @@ const OrderedItems: React.FC<{ accessToken: string }> = ({ accessToken }) => {
 
   const returnItem = async (order_item_id: number) => {
     try {
-      await axios.post(
-        `http://localhost:5001/api/orders/return/${order_item_id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api_post_return(accessToken, {
+        order_item_id,
+        reason: "",
+      });
       toast.success("Item returned successfully");
       fetchItems();
     } catch {
@@ -48,24 +50,31 @@ const OrderedItems: React.FC<{ accessToken: string }> = ({ accessToken }) => {
             key={item.order_item_id}
             className="border p-4 rounded-lg shadow-sm w-full flex flex-col justify-between space-y-4"
           >
-            <div className="space-y-4">
-              <div>
-                <Label>Product</Label>
-                <p className="border px-3 py-2 rounded bg-muted text-sm">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <Label className="w-32">Order - Item ID</Label>
+                <p className="border px-3 py-1.5 rounded bg-muted text-sm">
+                  {item.order_id} - {item.order_item_id}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Label className="w-32">Product</Label>
+                <p className="border px-3 py-1.5 rounded bg-muted text-sm">
                   {item.product_name}
                 </p>
               </div>
 
-              <div>
-                <Label>Price</Label>
-                <p className="border px-3 py-2 rounded bg-muted text-sm">
+              <div className="flex items-center gap-3">
+                <Label className="w-32">Price</Label>
+                <p className="border px-3 py-1.5 rounded bg-muted text-sm">
                   ${item.price}
                 </p>
               </div>
 
-              <div>
-                <Label>Ordered On</Label>
-                <p className="border px-3 py-2 rounded bg-muted text-sm">
+              <div className="flex items-center gap-3">
+                <Label className="w-32">Ordered On</Label>
+                <p className="border px-3 py-1.5 rounded bg-muted text-sm">
                   {new Date(item.ordered_at).toLocaleDateString()}
                 </p>
               </div>
