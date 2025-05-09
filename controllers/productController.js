@@ -9,7 +9,7 @@ export const getAllProducts = async (req, res, next) => {
       attributes: {
         include: [
           [
-            Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+            Sequelize.fn("COUNT", Sequelize.col("Inventories.inventory_id")),
             "inventory_count",
           ],
         ],
@@ -21,6 +21,7 @@ export const getAllProducts = async (req, res, next) => {
         },
         {
           model: Inventory,
+          as: "Inventories",
           attributes: [],
         },
       ],
@@ -91,6 +92,7 @@ export const utilsGetFilteredProducts = async ({
     },
     {
       model: Inventory,
+      as: "Inventories",
       attributes: [],
     },
   ];
@@ -106,7 +108,7 @@ export const utilsGetFilteredProducts = async ({
     attributes: {
       include: [
         [
-          Sequelize.fn("COUNT", Sequelize.col("inventories.inventory_id")),
+          Sequelize.fn("COUNT", Sequelize.col("Inventories.inventory_id")),
           "inventory_count",
         ],
       ],
