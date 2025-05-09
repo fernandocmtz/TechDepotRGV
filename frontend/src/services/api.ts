@@ -19,7 +19,6 @@ export function api_get_all_products() {
   return new Promise<Product[]>((resolve, reject) => {
     fetch(`${url}/api/products`, {
       method: "GET",
-      credentials: "include",
     })
       .then((res) => {
         if (res.ok) {
