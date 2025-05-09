@@ -8,7 +8,7 @@ import { useAuth } from "@/context/auth/useAuth";
 import { useCart } from "@/context/cart/useCart";
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, isAdmin } = useAuth();
   const { cartItems } = useCart();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -54,6 +54,7 @@ const Navbar = () => {
                 { text: "Products", path: "/products" },
                 { text: "Categories", path: "/categories" },
                 isAuthenticated && { text: "Profile", path: "/profile" },
+                isAdmin && { text: "Admin", path: "/admin" },
                 isAuthenticated && { text: "Logout", path: "/" },
                 !isAuthenticated && { text: "Sign In", path: "/signin" },
               ]
@@ -119,7 +120,6 @@ const Navbar = () => {
                 { text: "Home", path: "/" },
                 { text: "Products", path: "/products" },
                 { text: "Categories", path: "/categories" },
-                { text: "Profile", path: "/profile" },
                 isAuthenticated && { text: "Profile", path: "/profile" },
                 isAuthenticated && { text: "Logout", path: "/" },
                 !isAuthenticated && { text: "Sign In", path: "/signin" },

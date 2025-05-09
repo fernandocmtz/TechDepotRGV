@@ -8,6 +8,9 @@ import {
   PostPutAddress,
   FetchOrderItems,
   PostReturn,
+  PostProduct,
+  FetchInventoryWithProductName,
+  PostPutInventory,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -250,6 +253,228 @@ export function api_post_return(accessToken: string, returnData: PostReturn) {
         Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(returnData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_product(
+  accessToken: string,
+  productData: PostProduct
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(productData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_put_product(
+  accessToken: string,
+  editProductId: number,
+  productData: PostProduct
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/${editProductId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(productData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_delete_product(
+  accessToken: string,
+  deleteProductId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/products/${deleteProductId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_get_all_users(accessToken: string) {
+  return new Promise<FetchedUser[]>((resolve, reject) => {
+    fetch(`${url}/api/users/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_patch_user_role(
+  accessToken: string,
+  userId: number,
+  role: string
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/users/role/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        role,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_get_inventories() {
+  return new Promise<FetchInventoryWithProductName[]>((resolve, reject) => {
+    fetch(`${url}/api/inventories/`, {
+      method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_inventories(
+  accessToken: string,
+  inventoryData: PostPutInventory
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(inventoryData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_put_inventories(
+  accessToken: string,
+  inventoryData: PostPutInventory,
+  inventoryId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/${inventoryId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(inventoryData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_delete_inventories(
+  accessToken: string,
+  inventoryId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/${inventoryId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
       .then((res) => {
         if (res.ok) {

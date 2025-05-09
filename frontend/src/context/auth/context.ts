@@ -2,7 +2,9 @@ import { createContext } from "react";
 
 export interface AuthContextType {
   isAuthenticated: boolean;
+  isAdmin: Boolean;
   accessToken: string;
+  role: string;
   loading: boolean;
   login: (
     username: string,
@@ -22,7 +24,9 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  isAdmin: false,
   accessToken: "",
+  role: "guest",
   loading: true,
   login: async () => ({ ok: false, message: "" }),
   logout: async () => {},

@@ -48,7 +48,9 @@ export const login = async (req, res) => {
       user_id: user.user_id,
     });
 
-    res.cookie("jid", rt, cookieOptions).json({ accessToken: at });
+    res
+      .cookie("jid", rt, cookieOptions)
+      .json({ accessToken: at, role: user.role });
   } catch (err) {
     console.error("Login error:", err.message);
     return res.status(500).json({ message: "Server error" });
@@ -57,7 +59,7 @@ export const login = async (req, res) => {
 
 // Registration Function
 export const register = async (req, res) => {
-  const { username, firstName, lastName, email, password, role } = req.body;
+  const { username, firstName, lastName, email, password } = req.body;
 
   try {
     const existingUser = await User.findOne({ where: { username } });
@@ -74,7 +76,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       first_name: firstName,
       last_name: lastName,
-      role: role || "user", // fallback if no role is provided
+      role: "user",
     });
 
     return res.status(201).json({ message: "User registered successfully" });
@@ -140,7 +142,7 @@ export const refreshToken = async (req, res) => {
 
   res
     .cookie("jid", newRt, cookieOptions)
-    .json({ ok: true, accessToken: newAt });
+    .json({ ok: true, accessToken: newAt, role: user.role });
 };
 
 export const logout = async (req, res) => {

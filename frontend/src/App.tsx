@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/auth/AuthProvider";
 import { CartProvider } from "./context/cart/CartProvider";
 import { PrivateRoute } from "./components/routes/PrivateRoute";
+import { AdminRoute } from "./components/routes/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +49,14 @@ const App = () => {
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/cart" element={<Cart />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminRoute>
+                      <Admin />
+                    </AdminRoute>
+                  }
+                />
                 <Route path="/signin" element={<SignIn />} />
                 <Route
                   path="/profile"

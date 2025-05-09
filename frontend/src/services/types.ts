@@ -125,3 +125,27 @@ export type PostReturn = {
   order_item_id: number;
   reason: string;
 };
+
+export type PostProduct = {
+  name: string;
+  description: string;
+  price: string;
+  category_id: number;
+  image_url: string;
+};
+
+export type FetchInventoryWithProductName = {
+  inventory_id: number;
+  sku: string;
+  product_id: number;
+  createdAt: string;
+  updatedAt: string;
+  Product: {
+    name: string;
+  };
+};
+
+export type PostPutInventory = {
+  product_id: number;
+  sku: string;
+};

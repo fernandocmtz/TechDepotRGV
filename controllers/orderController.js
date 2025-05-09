@@ -37,6 +37,7 @@ export const createOrder = async (req, res, next) => {
         email: GUEST_USER.EMAIL,
         phone_number: GUEST_USER.PHONE_NUMBER,
         password: hashedPassword,
+        role: GUEST_USER.ROLE,
       },
     });
 
