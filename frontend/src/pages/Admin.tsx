@@ -287,7 +287,7 @@ const Admin = () => {
           Users
         </Button>
         <Button
-          variant={activeTab === "users" ? "default" : "outline"}
+          variant={activeTab === "inventory" ? "default" : "outline"}
           onClick={() => setActiveTab("inventory")}
         >
           Inventory
