@@ -10,6 +10,7 @@ import {
   PostReturn,
   PostProduct,
   FetchInventoryWithProductName,
+  PostPutInventory,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -397,6 +398,83 @@ export function api_get_inventories() {
   return new Promise<FetchInventoryWithProductName[]>((resolve, reject) => {
     fetch(`${url}/api/inventories/`, {
       method: "GET",
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_post_inventories(
+  accessToken: string,
+  inventoryData: PostPutInventory
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(inventoryData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_put_inventories(
+  accessToken: string,
+  inventoryData: PostPutInventory,
+  inventoryId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/${inventoryId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(inventoryData),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_delete_inventories(
+  accessToken: string,
+  inventoryId: number
+) {
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/api/inventories/${inventoryId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
       .then((res) => {
         if (res.ok) {

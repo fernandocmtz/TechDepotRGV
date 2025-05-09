@@ -144,3 +144,8 @@ export type FetchInventoryWithProductName = {
     name: string;
   };
 };
+
+export type PostPutInventory = {
+  product_id: number;
+  sku: string;
+};

@@ -22,9 +22,13 @@ import {
   api_get_all_users,
   api_patch_user_role,
   api_get_inventories,
+  api_post_inventories,
+  api_put_inventories,
+  api_delete_inventories,
 } from "@/services/api";
 import axios from "axios";
 import { useAuth } from "@/context/auth/useAuth";
+import { FetchInventoryWithProductName } from "@/services/types";
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState<
@@ -40,7 +44,9 @@ const Admin = () => {
     category_id: "",
   });
 
-  const [inventory, setInventory] = useState([]);
+  const [inventory, setInventory] = useState<FetchInventoryWithProductName[]>(
+    []
+  );
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [editingInventory, setEditingInventory] = useState(null);
   const [inventoryForm, setInventoryForm] = useState({
@@ -78,6 +84,16 @@ const Admin = () => {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!inventoryOpen) {
+      setEditingInventory(null);
+      setInventoryForm({
+        sku: "",
+        product_id: "",
+      });
+    }
+  }, [inventoryOpen]);
 
   useEffect(() => {
     if (activeTab === "products") {
@@ -183,14 +199,75 @@ const Admin = () => {
     }
   };
 
-  const fetchInventory = async () => {
-    /* GET /api/admin/inventory */
-  };
-  const openInventoryModal = (item = null) => {
+  const openInventoryModal = (
+    item: FetchInventoryWithProductName | null = null
+  ) => {
     /* set form + open dialog */
+    setInventoryOpen(true);
+    setEditingInventory(item);
+    setInventoryForm({
+      sku: item.sku,
+      product_id: String(item.product_id),
+    });
   };
   const handleInventorySubmit = async (e) => {
-    /* POST or PUT inventory */
+    e.preventDefault();
+    if (!inventoryForm.sku || !inventoryForm.product_id) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill in all fields",
+      });
+      return;
+    }
+    const inventoryData = {
+      ...inventoryForm,
+      product_id: Number(inventoryForm.product_id),
+    };
+    if (editingInventory) {
+      try {
+        await api_put_inventories(
+          accessToken,
+          inventoryData,
+          editingInventory.inventory_id
+        );
+        toast({ title: "Success", description: "Inventory updated" });
+        setInventoryOpen(false);
+        fetchInventories();
+      } catch {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update inventory.",
+        });
+      }
+    } else {
+      try {
+        await api_post_inventories(accessToken, inventoryData);
+        toast({ title: "Success", description: "Inventory created" });
+        setInventoryOpen(false);
+        fetchInventories();
+      } catch {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to add inventory.",
+        });
+      }
+    }
+  };
+
+  const handleDeleteInventory = async (inventoryId) => {
+    try {
+      await api_delete_inventories(accessToken, inventoryId);
+      fetchInventories();
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete inventory.",
+      });
+    }
   };
 
   return (
@@ -426,12 +503,20 @@ const Admin = () => {
                       {item.Product?.name || "Unknown Product"}
                     </p>
                   </div>
-                  <Button
-                    variant="secondary"
-                    onClick={() => openInventoryModal(item)}
-                  >
-                    Edit
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      onClick={() => openInventoryModal(item)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteInventory(item.inventory_id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
