@@ -21,12 +21,15 @@ import {
   api_delete_product,
   api_get_all_users,
   api_patch_user_role,
+  api_get_inventories,
 } from "@/services/api";
 import axios from "axios";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState<"products" | "users">("products");
+  const [activeTab, setActiveTab] = useState<
+    "products" | "users" | "inventory"
+  >("products");
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
@@ -35,6 +38,14 @@ const Admin = () => {
     price: "",
     image_url: "",
     category_id: "",
+  });
+
+  const [inventory, setInventory] = useState([]);
+  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [editingInventory, setEditingInventory] = useState(null);
+  const [inventoryForm, setInventoryForm] = useState({
+    sku: "",
+    product_id: "",
   });
 
   const { accessToken } = useAuth();
@@ -55,6 +66,19 @@ const Admin = () => {
     }
   }, [accessToken]);
 
+  const fetchInventories = useCallback(async () => {
+    try {
+      const inventory = await api_get_inventories();
+      setInventory(inventory);
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load users",
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab === "products") {
       fetchProducts();
@@ -63,7 +87,11 @@ const Admin = () => {
     if (activeTab === "users") {
       fetchUsers();
     }
-  }, [activeTab, fetchUsers, fetchProducts]);
+
+    if (activeTab === "inventory") {
+      fetchInventories();
+    }
+  }, [activeTab, fetchUsers, fetchProducts, fetchInventories]);
 
   const toggleAdmin = async (userId, role) => {
     try {
@@ -155,6 +183,16 @@ const Admin = () => {
     }
   };
 
+  const fetchInventory = async () => {
+    /* GET /api/admin/inventory */
+  };
+  const openInventoryModal = (item = null) => {
+    /* set form + open dialog */
+  };
+  const handleInventorySubmit = async (e) => {
+    /* POST or PUT inventory */
+  };
+
   return (
     <Layout>
       {/* Tab Switcher */}
@@ -170,6 +208,12 @@ const Admin = () => {
           onClick={() => setActiveTab("users")}
         >
           Users
+        </Button>
+        <Button
+          variant={activeTab === "users" ? "default" : "outline"}
+          onClick={() => setActiveTab("inventory")}
+        >
+          Inventory
         </Button>
       </div>
 
@@ -306,6 +350,88 @@ const Admin = () => {
                       {user.role === "admin" ? "Remove Admin" : "Make Admin"}
                     </Button>
                   )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "inventory" && (
+        <div className="flex flex-col items-center space-y-2 mb-4">
+          <h2 className="text-xl font-semibold">Inventory Management</h2>
+
+          <Dialog open={inventoryOpen} onOpenChange={setInventoryOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => openInventoryModal()}>
+                Add Inventory
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <form className="space-y-4" onSubmit={handleInventorySubmit}>
+                <div>
+                  <Label>SKU</Label>
+                  <Input
+                    name="sku"
+                    value={inventoryForm.sku}
+                    onChange={(e) =>
+                      setInventoryForm((prev) => ({
+                        ...prev,
+                        sku: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Product</Label>
+                  <Select
+                    value={inventoryForm.product_id}
+                    onValueChange={(value) =>
+                      setInventoryForm((prev) => ({
+                        ...prev,
+                        product_id: value,
+                      }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((p) => (
+                        <SelectItem
+                          key={p.product_id}
+                          value={String(p.product_id)}
+                        >
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit">Save Inventory</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+
+          <div className="w-full flex justify-center">
+            <div className="max-w-2xl max-h-[500px] overflow-y-auto space-y-4 w-full">
+              {inventory.map((item) => (
+                <div
+                  key={item.inventory_id}
+                  className="border p-4 rounded flex justify-between items-center"
+                >
+                  <div>
+                    <h3 className="font-semibold">{item.sku}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {item.Product?.name || "Unknown Product"}
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => openInventoryModal(item)}
+                  >
+                    Edit
+                  </Button>
                 </div>
               ))}
             </div>

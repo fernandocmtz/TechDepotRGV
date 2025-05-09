@@ -9,6 +9,7 @@ import {
   FetchOrderItems,
   PostReturn,
   PostProduct,
+  FetchInventoryWithProductName,
 } from "./types";
 
 const url = import.meta.env.VITE_API_URL;
@@ -378,6 +379,24 @@ export function api_patch_user_role(
       body: JSON.stringify({
         role,
       }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          resolve(res.json());
+        } else {
+          throw res;
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+export function api_get_inventories() {
+  return new Promise<FetchInventoryWithProductName[]>((resolve, reject) => {
+    fetch(`${url}/api/inventories/`, {
+      method: "GET",
     })
       .then((res) => {
         if (res.ok) {

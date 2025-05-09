@@ -133,3 +133,14 @@ export type PostProduct = {
   category_id: number;
   image_url: string;
 };
+
+export type FetchInventoryWithProductName = {
+  inventory_id: number;
+  sku: string;
+  product_id: number;
+  createdAt: string;
+  updatedAt: string;
+  Product: {
+    name: string;
+  };
+};
