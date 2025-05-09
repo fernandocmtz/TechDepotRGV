@@ -34,6 +34,8 @@ export const login = async (req, res) => {
     const payload = {
       id: user.user_id,
       username: user.username,
+      firstName: user.first_name,
+      lastName: user.last_name,
       role: user.role,
     };
 
@@ -81,6 +83,26 @@ export const register = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Registration failed", error: err.message });
+  }
+};
+
+// Update User Profile Function
+export const updateUser = async (req, res) => {
+  const { email, phone_number } = req.body;
+
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.email = email ?? user.email;
+    user.phone_number = phone_number ?? user.phone_number;
+
+    await user.save();
+
+    res.json({ message: "Profile updated successfully", user });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ message: "Update failed", error: err.message });
   }
 };
 

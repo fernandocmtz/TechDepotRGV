@@ -1,3 +1,4 @@
+
 -- Users Table
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -104,4 +105,16 @@ CREATE TABLE returns (
     status ENUM('requested', 'approved', 'rejected', 'processed') DEFAULT 'requested',
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id) ON DELETE CASCADE
+);
+
+-- Payment Methods Table
+CREATE TABLE payment_methods (
+  method_id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  cardholder_name VARCHAR(100) NOT NULL,
+  card_last4 VARCHAR(4) NOT NULL,
+  expiration_date VARCHAR(7) NOT NULL, -- Format: MM/YYYY
+  brand ENUM('visa', 'mastercard', 'amex', 'paypal') NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );

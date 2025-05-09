@@ -12,8 +12,10 @@ import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
 import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/auth/AuthProvider";
 import { CartProvider } from "./context/cart/CartProvider";
+import { PrivateRoute } from "./components/routes/PrivateRoute";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,14 @@ const App = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/signin" element={<SignIn />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
+                    </PrivateRoute>
+                  }
+                />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

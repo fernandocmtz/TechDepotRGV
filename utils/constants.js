@@ -28,4 +28,11 @@ export const SHIPMENT_STATUS = {
   DELIVERED: "delivered",
 };
 
-export const COURIERS = ["USPS", "UPS", "FedEx", "DHL", "Purolater"]
+export const RETURN_STATUS = {
+  APPROVED: "approved",
+  REQUESTED: "requested",
+  REJECTED: "rejected",
+  PROCESSED: "processed",
+};
+
+export const COURIERS = ["USPS", "UPS", "FedEx", "DHL", "Purolater"];

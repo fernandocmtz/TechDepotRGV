@@ -44,10 +44,12 @@ export const User = sequelize.define(
 
 // Fetch all users
 export const getAllUsers = async () => {
-  return await User.findAll();
+  return await User.findAll({
+    attributes: { exclude: ["password"] },
+  });
 };
 
 // Fetch user by ID
 export const getUserById = async (id) => {
-  return await User.findByPk(id);
+  return await User.findByPk(id, { attributes: { exclude: ["password"] } });
 };

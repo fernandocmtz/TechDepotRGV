@@ -59,3 +59,69 @@ export type OrderPaymentData = {
   card_expiry: string;
   card_cvv: string;
 };
+
+export type PatchUser = {
+  email: FetchedUser["email"];
+  phone_number: FetchedUser["phone_number"];
+};
+
+export type FetchedUser = {
+  user_id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone_number: string | null;
+  role: string;
+};
+
+export type FetchedAddress = {
+  address_id: number;
+  user_id: number;
+  address_line_1: string;
+  address_line_2: string | null;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
+};
+
+export type PostPutAddress = {
+  address_line_1: string;
+  address_line_2: string | null;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+};
+
+export type FetchOrderItems = {
+  orderedItems: FetchNonReturnedOrderItems[];
+  returnedItems: FetchReturnedItems[];
+};
+
+export type FetchNonReturnedOrderItems = {
+  ordered_at: string;
+  order_item_id: number;
+  order_id: number;
+  product_name: string;
+  price: number;
+  order_status: string;
+  shipment_status: string;
+};
+
+export type FetchReturnedItems = {
+  ordered_at: string;
+  order_item_id: number;
+  order_id: number;
+  product_name: string;
+  price: number;
+  status: string;
+};
+
+export type PostReturn = {
+  order_item_id: number;
+  reason: string;
+};

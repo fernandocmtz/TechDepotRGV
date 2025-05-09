@@ -123,7 +123,7 @@ const SignIn = () => {
       toast.error(message || "Registration error occurred");
     }
   };
-
+  
   return (
     <Layout>
       <div className="container max-w-md mx-auto py-12">

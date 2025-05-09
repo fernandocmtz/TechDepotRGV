@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/context/cart/useCart";
 import { useProducts } from "@/hooks/useProducts";
 import { CartItem, OrderData, Product } from "@/services/types";
-import { api_post_order } from "@/services/api";
+import { api_get_active_user_addresses, api_post_order } from "@/services/api";
 import { useAuth } from "@/context/auth/useAuth";
 
 const Cart = () => {
@@ -25,6 +25,7 @@ const Cart = () => {
 
   const [step, setStep] = useState<"address" | "payment">("address");
 
+  const [addresses, setAddresses] = useState([]);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [addressLine1, setAddressLine1] = useState("");
@@ -47,7 +48,23 @@ const Cart = () => {
     [cartItemsV2]
   );
 
+  const fetchAddress = useCallback(async () => {
+    try {
+      const addresses = await api_get_active_user_addresses(accessToken);
+      setAddresses(addresses);
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Error loading saved addresses",
+      });
+    }
+  }, [accessToken]);
+
   useEffect(() => {
+    if (showCheckoutModal) {
+      fetchAddress();
+    }
+
     if (!showCheckoutModal) {
       setStep("address");
       setSelectedAddress("");
@@ -66,7 +83,7 @@ const Cart = () => {
       setError("");
       setSuccess("");
     }
-  }, [showCheckoutModal]);
+  }, [showCheckoutModal, fetchAddress]);
 
   useEffect(() => {
     if (productIds.length === 0) {
@@ -131,14 +148,29 @@ const Cart = () => {
   };
 
   const handleOrder = async () => {
+    const savedAddressFields =
+      selectedAddress === "new"
+        ? {}
+        : addresses.find(
+            (address) => address.address_id === Number(selectedAddress)
+          );
     const shippingAddress: OrderData = {
       address: {
-        address_line_1: addressLine1,
-        address_line_2: addressLine2,
-        city: city,
-        state: stateRegion,
-        zip_code: zipCode,
-        country: country,
+        address_line_1:
+          selectedAddress === "new"
+            ? addressLine1
+            : savedAddressFields.address_line_1,
+        address_line_2:
+          selectedAddress === "new"
+            ? addressLine2
+            : savedAddressFields.address_line_2,
+        city: selectedAddress === "new" ? city : savedAddressFields.city,
+        state:
+          selectedAddress === "new" ? stateRegion : savedAddressFields.state,
+        zip_code:
+          selectedAddress === "new" ? zipCode : savedAddressFields.zip_code,
+        country:
+          selectedAddress === "new" ? country : savedAddressFields.country,
       },
       products: cartItemsV2.map(({ product_id, quantity }) => ({
         product_id,
@@ -165,8 +197,6 @@ const Cart = () => {
     }
   };
 
-  const addresses = [];
-
   const validAddress =
     (selectedAddress !== "new" && selectedAddress) ||
     (addressLine1.trim() &&
@@ -184,6 +214,8 @@ const Cart = () => {
     paymentExpiry.match(/^(0[1-9]|1[0-2])\/?([0-9]{2})$/) &&
     paymentCvv.trim() &&
     paymentCvv.length === 3;
+
+  console.log(selectedAddress);
 
   return (
     <Layout>
@@ -381,8 +413,8 @@ const Cart = () => {
                 >
                   <option value="">-- Choose an address --</option>
                   {addresses.map((addr, idx) => (
-                    <option key={idx} value={addr}>
-                      {addr}
+                    <option key={idx} value={String(addr.address_id)}>
+                      {`${addr.address_line_1} ${addr.address_line_2} ${addr.city} ${addr.state} ${addr.country}`}
                     </option>
                   ))}
                   <option value="new">Enter New Address</option>
