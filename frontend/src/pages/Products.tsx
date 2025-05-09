@@ -18,10 +18,6 @@ const Products = () => {
   const { products: productsV2, refresh, loading } = useProducts();
   const { categories: categoriesV2 } = useCategories();
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
   const queryCategoryId = searchParams.get("category")
     ? Number(searchParams.get("category"))
     : null;
@@ -30,9 +26,32 @@ const Products = () => {
     (category: Category) => category.category_id === queryCategoryId
   );
 
-  const [activeCategory, setActiveCategory] = useState(
-    queryCategory ?? ({ category_id: null, name: "All Products" } as Category)
-  );
+  const [activeCategory, setActiveCategory] = useState({
+    category_id: null,
+    name: "All Products",
+  } as Category);
+
+  useEffect(() => {
+    if (queryCategory) {
+      setActiveCategory(queryCategory);
+    } else if (!queryCategoryId) {
+      setActiveCategory({
+        category_id: null,
+        name: "All Products",
+      } as Category);
+    }
+  }, [queryCategory, queryCategoryId]);
+
+  useEffect(() => {
+    if (activeCategory.category_id) {
+      refresh({
+        category_id: activeCategory.category_id,
+      });
+    } else {
+      refresh();
+    }
+  }, [activeCategory, refresh]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState({
     min: "",
@@ -59,17 +78,6 @@ const Products = () => {
 
     return productsV2;
   }, [productsV2, searchQuery]);
-
-  useEffect(() => {
-    if (queryCategory) {
-      setActiveCategory(queryCategory);
-    } else {
-      setActiveCategory({
-        category_id: null,
-        name: "All Products",
-      } as Category);
-    }
-  }, [queryCategory]);
 
   const handleCategoryChange = (category: Category) => {
     setActiveCategory(category);
