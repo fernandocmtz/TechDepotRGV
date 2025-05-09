@@ -60,7 +60,7 @@ const Navbar = () => {
                 .filter(Boolean)
                 .map((link) => (
                   <Link
-                    key={link.path}
+                    key={link.text}
                     to={link.path}
                     className={cn(
                       "text-sm font-medium transition-colors hover:text-tech-blue relative py-1",
@@ -120,10 +120,12 @@ const Navbar = () => {
                 { text: "Products", path: "/products" },
                 { text: "Categories", path: "/categories" },
                 { text: "Profile", path: "/profile" },
-                { text: "Sign In", path: "/signin" },
+                isAuthenticated && { text: "Profile", path: "/profile" },
+                isAuthenticated && { text: "Logout", path: "/" },
+                !isAuthenticated && { text: "Sign In", path: "/signin" },
               ].map((link) => (
                 <Link
-                  key={link.path}
+                  key={link.text}
                   to={link.path}
                   className={cn(
                     "text-sm font-medium py-2",
