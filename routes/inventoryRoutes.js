@@ -3,6 +3,7 @@ import {
   createInventory,
   deleteInventory,
   getInventories,
+  populateMockInventory,
   putInventory,
 } from "../controllers/inventoryController.js";
 import { verifyAdminToken } from "../middleware/authMiddleware.js";
@@ -10,6 +11,8 @@ import { verifyAdminToken } from "../middleware/authMiddleware.js";
 const router = express.Router();
 
 router.get("/", getInventories);
+
+router.get("/populate", populateMockInventory);
 
 router.post("/", verifyAdminToken, createInventory);
 
